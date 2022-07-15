@@ -33,8 +33,10 @@ public class LoginController {
 
 	Logger logger = LoggerFactory.getLogger(LoginController.class);
 	
+	private final String originURL = "https://schedularfortuck.netlify.app";
+	
 
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = originURL)
 	@PostMapping("/login")
 	public LoginResponse login(@RequestBody LoginForm loginForm ) throws IOException, CsvException {
 		logger.info(loginForm.toString());
@@ -46,7 +48,7 @@ public class LoginController {
 		return b;
 			
 	}
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = originURL)
 	@GetMapping("/get-user-details/{username}")
 	public UserDetailsWithAvalabilites getUserDetails(@PathVariable String username , @RequestHeader String password) throws IOException, CsvException, ParseException {
 		logger.info("username:{}",username);
@@ -60,7 +62,7 @@ public class LoginController {
 	}
 
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = originURL)
 	@PostMapping("/availabilities")
 	public String availableities(@RequestBody Availabilitys availabilitys ) throws IOException, CsvException {
 		logger.info(availabilitys.toString());	
@@ -78,7 +80,7 @@ public class LoginController {
 	}
 	
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = originURL)
 	@GetMapping("/generate-otp/{username}")
 	public String generateOTP(@PathVariable String username ) throws IOException, CsvException {
 		logger.info(username);
@@ -92,7 +94,7 @@ public class LoginController {
 	}
 	
 
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins =originURL)
 	@PostMapping("/reset-password")
 	public String resetPassword(@RequestBody ResetPasswordBean reset ) throws IOException, CsvException {
 		logger.info(reset.toString());
@@ -102,7 +104,7 @@ public class LoginController {
 			
 	}
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = originURL)
 	@PostMapping("/delete-availability")
 	public String deleteAvalibility(@RequestBody Availabilitys availabilitys) throws IOException, CsvException {
 		logger.info(availabilitys.toString());
@@ -113,7 +115,7 @@ public class LoginController {
 	}
 	
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = originURL)
 	@PostMapping("/sign-up")
 	public String signUp(@RequestBody UserDetails userdetails ) throws IOException, CsvException {
 		logger.info(userdetails.toString());
@@ -123,7 +125,7 @@ public class LoginController {
 			
 	}
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = originURL)
 	@PostMapping("/edit-profile")
 	public String editProfile(@RequestBody UserDetails userdetails ) throws IOException, CsvException {
 		logger.info(userdetails.toString());
@@ -133,7 +135,7 @@ public class LoginController {
 	}
 	
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = originURL)
 	@GetMapping("/schedule/{username}")
 	public String schedule(@PathVariable String username , @RequestHeader String password) throws IOException, CsvException, ParseException {
 		logger.info("username {}, password:{}",username, password);
