@@ -34,6 +34,7 @@ public class LoginController {
 	Logger logger = LoggerFactory.getLogger(LoginController.class);
 	
 	private final String originURL = "https://schedularfortuck.netlify.app";
+//	private final String originURL = "http://localhost:3000";
 	
 
 	@CrossOrigin(origins = originURL)

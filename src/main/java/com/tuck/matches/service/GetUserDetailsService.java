@@ -22,7 +22,7 @@ public class GetUserDetailsService {
 	
 	Logger logger = LoggerFactory.getLogger(GetUserDetailsService.class);
 	
-	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
+	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
 	
 
 
@@ -76,7 +76,7 @@ public class GetUserDetailsService {
 
 	private void populateAvalabilities(String[] strings, UserDetailsWithAvalabilites ava) throws ParseException {
 		Availabilitys availability = new Availabilitys();
-		formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+		formatter.setTimeZone(TimeZone.getTimeZone("America/New_York"));
 		availability.setStartDate(formatter.parse(strings[1]));
 		availability.setEndDate(formatter.parse(strings[2]));
 		ava.getAvailabilitys().add(availability);

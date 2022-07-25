@@ -166,6 +166,8 @@ public class SchedularService {
 			if(i<=1) {
 				return false;
 			}
+		}else {
+			return false;
 		}
 		return true;
 	}
@@ -281,7 +283,7 @@ public class SchedularService {
 		menteewriter.writeAll(mentees);
 		menteewriter.close();
 		
-		File masterMatchesFile = new File("./src/main/resources/menteeAvailabilities.csv");
+		File masterMatchesFile = new File("./src/main/resources/masterMatch.csv");
 		FileWriter masterMatchesFileWriter = new FileWriter(masterMatchesFile);
 		CSVWriter masterMatchesCSVWriter = new CSVWriter(masterMatchesFileWriter);
 		masterMatchesCSVWriter.writeAll(masterMatchs);

@@ -13,8 +13,12 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>matches</name>
 	<description>project for Matching mentor and mentee</description>
-	<packaging>jar</packaging>
-	<!-- <properties>
+	<!--change when jar is needed <packaging>jar</packaging> -->
+	<!--<packaging>war</packaging> -->
+	<!--change when jar is needed -->
+	<packaging>jar</packaging> 
+	 <!--
+	 <properties>
 		<java.version>8</java.version>
 	</properties>-->
 	<dependencies>
