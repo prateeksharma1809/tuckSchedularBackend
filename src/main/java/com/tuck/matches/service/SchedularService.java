@@ -81,6 +81,7 @@ public class SchedularService {
 		}
 		sendMailToUnmatchedMentees(menteeAvailabilities,mentorAvailabilities);
 		matchesJpaRepository.saveAll(matchesRecord);
+		availabilitiesRepository.deleteAll();
 		
 	}
 	
