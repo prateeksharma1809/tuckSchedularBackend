@@ -11,19 +11,51 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvException;
 import com.tuck.matches.beans.UserDetails;
+import com.tuck.matches.entities.Credentials;
+import com.tuck.matches.repository.CredentialsRepository;
 
 public class SignUpService {
 	Logger logger = LoggerFactory.getLogger(SignUpService.class);
+	
+	@Autowired
+	private CredentialsRepository credentialsRepository;
 
+	@Autowired
+	private Credentials credentials;
+	
 	public void signUp(UserDetails user) throws FileNotFoundException, IOException, CsvException {
 		this.validate(user);
 		this.checkUserExists(user.getUserName());
 		this.createUser(user);
+	}
+	
+	public void signUpDB(UserDetails user) {
+		this.validate(user);
+		this.createUserInDB(user);
+	}
+
+	private void createUserInDB(UserDetails user) {
+		credentialsRepository.save(createCredentialObject(user));
+		
+	}
+
+	private Credentials createCredentialObject(UserDetails user) {
+		credentials.setUserName(user.getUserName());
+		credentials.setPassword(user.getPassword());
+		credentials.setName(user.getName());
+		credentials.setIsMentor(user.getIsMentor());
+		if(user.getIsMentor()) {
+			credentials.setInterFirm(user.getInterFirm());
+			credentials.setFullTmOffer(user.getFullTmOffer());
+			credentials.setCaseName(user.getCaseName());
+		}
+		return credentials;
 	}
 
 	private void createUser(UserDetails user) throws IOException {

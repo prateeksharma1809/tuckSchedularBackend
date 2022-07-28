@@ -15,10 +15,18 @@ import java.util.List;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvException;
+import com.tuck.matches.entities.Availabilities;
+import com.tuck.matches.entities.Credentials;
+import com.tuck.matches.entities.Matches;
+import com.tuck.matches.entities.MatchesId;
+import com.tuck.matches.repository.AvailabilitiesRepository;
+import com.tuck.matches.repository.CredentialsRepository;
+import com.tuck.matches.repository.MatchesJpaRepository;
 
 public class SchedularService {
 
@@ -26,7 +34,149 @@ public class SchedularService {
 	SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
 	Logger logger = LoggerFactory.getLogger(SchedularService.class);
+	
+	@Autowired
+	private AvailabilitiesRepository availabilitiesRepository;
+	
+	@Autowired
+	private MatchesJpaRepository matchesJpaRepository;
+	
+	@Autowired
+	private CredentialsRepository credentialsRepository;
+	
+	@Autowired
+	private SendMailService sendMailService;
 
+	public void schedular() {
+		List<Availabilities> mentorAvailabilities = availabilitiesRepository.retrieveMentorAvalabilities();
+		List<Availabilities> menteeAvailabilities = availabilitiesRepository.retrieveMenteeAvalabilities();
+		List<Matches> matchesRecord = matchesJpaRepository.findAll();
+		List<Matches> newMatches = new ArrayList<Matches>();
+		if(null!=mentorAvailabilities && null!=menteeAvailabilities && !mentorAvailabilities.isEmpty() && !menteeAvailabilities.isEmpty()) {
+			for (Availabilities mentorAva : mentorAvailabilities) {
+				for (Availabilities menteeAva : menteeAvailabilities) {
+					if (mentorAva.getAvailabilitiesId().getFrom().compareTo(menteeAva.getAvailabilitiesId().getFrom()) >= 0 
+							&& mentorAva.getAvailabilitiesId().getTo().compareTo(menteeAva.getAvailabilitiesId().getTo()) <= 0 
+							&& !checkAlreadyMatched2Times(menteeAva, mentorAva, matchesRecord)) {
+							MatchesId matchedId = new MatchesId();
+							matchedId.setEmail_mentee(menteeAva.getAvailabilitiesId().getUserName());
+							matchedId.setEmail_mentor(mentorAva.getAvailabilitiesId().getUserName());
+							matchedId.setFrom(mentorAva.getAvailabilitiesId().getFrom());
+							matchedId.setTo(mentorAva.getAvailabilitiesId().getTo());
+							Matches matches = new Matches();
+							String cases = checkCasesMatched(menteeAva, mentorAva);
+							matches.setMatchesId(matchedId);
+							matches.setCases(cases);
+							menteeAva.setIsMatched(true);
+							mentorAva.setIsMatched(true);
+							newMatches.add(matches);
+							matchesRecord.add(matches);
+					}
+				}
+				
+			}
+		}
+		if(!newMatches.isEmpty()) {
+			sendMailToMatched(newMatches);
+		}
+		sendMailToUnmatchedMentees(menteeAvailabilities,mentorAvailabilities);
+		matchesJpaRepository.saveAll(matchesRecord);
+		
+	}
+	
+	
+	private void sendMailToUnmatchedMentees(List<Availabilities> menteeAvailabilities,
+			List<Availabilities> mentorAvailabilities) {
+		List<Availabilities> availableMentors = new ArrayList<>();
+		for (Availabilities mentor : mentorAvailabilities) {
+			if(!mentor.getIsMatched()) {
+				availableMentors.add(mentor);
+			}
+		}
+		if(!availableMentors.isEmpty()) {
+			for (Availabilities mentee : menteeAvailabilities) {
+				if(!mentee.getIsMatched()) {
+					String body = "Hi Mentee, \n Your time slot does not coincide with any available mentor time slot,"
+							+ "\n Don't worry we got you covered. Below are some slots still available.\n";
+					for(Availabilities mentorAva : availableMentors) {
+						body +="\n Email: "+mentorAva.getAvailabilitiesId().getUserName()+ "\t Available from : "
+								+mentorAva.getAvailabilitiesId().getFrom()+", till: "+mentorAva.getAvailabilitiesId().getTo();
+					}
+					logger.info("body : {}", body);
+					sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(), "Hurry!", body);
+				}
+			}
+		}
+		
+	}
+
+
+	private void sendMailToMatched(List<Matches> newMatches) {
+		for (Matches matches : newMatches) {
+			Credentials mentorCred = credentialsRepository.getById(matches.getMatchesId().getEmail_mentor());
+			Credentials menteeCred = credentialsRepository.getById(matches.getMatchesId().getEmail_mentee());
+			
+			String body = "Hi "+mentorCred.getName()+
+					",\n You are matched with : "+menteeCred.getName()+", Email : " + matches.getMatchesId().getEmail_mentee() + " \nfrom : " + matches.getMatchesId().getFrom() + " to : "
+							+  matches.getMatchesId().getTo();
+			if (!matches.getCases().isEmpty()) {
+				body += " common case type is : " + matches.getCases();
+			}
+			logger.info("mentor body : {}", body);
+			sendMailService.sendMail(matches.getMatchesId().getEmail_mentor(), "Case and time Matched", body);
+			body = "Hi "+menteeCred.getName()+",\n You are matched with : "+mentorCred.getName()+", Email : " 
+					+ matches.getMatchesId().getEmail_mentor() + " \nfrom : " + matches.getMatchesId().getFrom() + " to: " + matches.getMatchesId().getTo();
+			if (!matches.getCases().isEmpty()) 
+				body += " common case type is : " + matches.getCases();
+			if(null!=mentorCred.getInterFirm() && !mentorCred.getInterFirm().isEmpty()) 
+				body +="\n "+mentorCred.getName()+" has done internship from :\n"+mentorCred.getInterFirm();
+			if(null!=mentorCred.getFullTmOffer() && !mentorCred.getFullTmOffer().isEmpty())
+				body +="\n is holding a full time offer from :\n"+mentorCred.getFullTmOffer();
+			if(null!= mentorCred.getCaseName() && !mentorCred.getCaseName().isEmpty()) 
+				body +="\n Cases are :\n"+mentorCred.getCaseName();
+			logger.info("mentee body : {}", body);
+			sendMailService.sendMail(matches.getMatchesId().getEmail_mentee(), "Case and time Matched", body);
+		}
+		
+	}
+
+
+	private String checkCasesMatched(Availabilities menteeAva, Availabilities mentorAva) {
+		String match ="";
+		if(menteeAva.getCases()!=null && !"".equals(menteeAva.getCases()) 
+				&& mentorAva.getCases()!=null && !"".equals(mentorAva.getCases())) {
+			String[] menteeCases = menteeAva.getCases().split(";");
+			String[] mentorCases = mentorAva.getCases().split(";");
+			for (String mentorCase : mentorCases) {
+				for (String menteeCase : menteeCases) {
+					if(mentorCase.equals(menteeCase)) {
+						match+=mentorCase;
+					}
+				}
+				
+			}
+		}
+		return match;
+	}
+
+
+	private boolean checkAlreadyMatched2Times(Availabilities menteeAva, Availabilities mentorAva, List<Matches> matchesRecord) {
+		int i = 0;
+		for (Matches matches : matchesRecord) {
+			if(matches.getMatchesId().getEmail_mentee().equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName()) 
+					&& matches.getMatchesId().getEmail_mentor().equalsIgnoreCase(mentorAva.getAvailabilitiesId().getUserName())) {
+				i++;
+			}
+		}
+		if(i>=2) {
+			logger.info("Mentor Mentee already paired 2 times");
+			return true;
+		}
+		return false;
+	}
+
+
+	@Deprecated
 	public void schedule() throws IOException, CsvException, ParseException {
 		List<String[]> mentors = null;
 		List<String[]> mentees = null;
@@ -121,7 +271,7 @@ public class SchedularService {
 		CSVWriter writer = new CSVWriter(outputfile);
 		writer.writeAll(matches);
 		writer.close();
-		updateMenteeAndMentorFiles(mentors, mentees, cred,masterMatchs);
+		updateMenteeAndMentorFiles(mentors, mentees, cred, masterMatchs);
 		this.sendMails(mentors, cred, matches);
 
 	}

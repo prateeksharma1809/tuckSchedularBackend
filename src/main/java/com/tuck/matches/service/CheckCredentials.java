@@ -4,18 +4,47 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import com.tuck.matches.beans.LoginForm;
 import com.tuck.matches.beans.LoginResponse;
+import com.tuck.matches.entities.Credentials;
+import com.tuck.matches.repository.CredentialsRepository;
 
 public class CheckCredentials {
 
 	Logger logger = LoggerFactory.getLogger(CheckCredentials.class);
+	
+	@Autowired
+	private LoginResponse loginResponse;
+	
+	@Autowired
+	private CredentialsRepository credentialsRepository;
+	
+	public LoginResponse checkInDB(LoginForm loginForm) {
+		
+		if(checkIfAdmin(loginForm)) {
+			loginResponse.setIsAdmin(true);
+			loginResponse.setOpenPage(false);
+			return loginResponse;
+		}
+		Optional<Credentials> record = credentialsRepository.findById(loginForm.getUserName());
+		if(record.isPresent()) {
+			Credentials cred = record.get();
+			if(cred.getPassword().equals(loginForm.getPassword())) {
+				loginResponse.setIsAdmin(false);
+				loginResponse.setOpenPage(true);
+			}
+		}
+	
+		return loginResponse;
+	}
 
 	public LoginResponse check(LoginForm loginForm) throws IOException, CsvException {
 		
@@ -25,6 +54,8 @@ public class CheckCredentials {
 			response.setOpenPage(false);
 			return response;
 		}
+		
+		
 		try (CSVReader reader = new CSVReader(new FileReader("./src/main/resources/credentials.csv"))) {
 			List<String[]> r = reader.readAll();
 			for (String[] strings : r) {
@@ -49,7 +80,8 @@ public class CheckCredentials {
 		}
 		return false;
 	}
-
+	
+	
 	private boolean checkIfAdmin(LoginForm loginForm) {
 		if("Admin".equals(loginForm.getUserName()) && "Admin11!".equals(loginForm.getPassword())) {
 			return true;

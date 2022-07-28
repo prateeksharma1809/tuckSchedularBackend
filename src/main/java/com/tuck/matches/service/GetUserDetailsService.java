@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -11,12 +12,17 @@ import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import com.tuck.matches.beans.Availabilitys;
 import com.tuck.matches.beans.UserDetails;
 import com.tuck.matches.beans.UserDetailsWithAvalabilites;
+import com.tuck.matches.entities.Availabilities;
+import com.tuck.matches.entities.Credentials;
+import com.tuck.matches.repository.AvailabilitiesRepository;
+import com.tuck.matches.repository.CredentialsRepository;
 
 public class GetUserDetailsService {
 	
@@ -24,8 +30,53 @@ public class GetUserDetailsService {
 	
 	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
 	
+	@Autowired
+	UserDetailsWithAvalabilites userDetailsWithAvalabilites;
+	
+	@Autowired
+	private CredentialsRepository credentialsRepository; 
+	
+	@Autowired
+	private AvailabilitiesRepository availabilitiesRepository;
+
+	public UserDetailsWithAvalabilites getUserDetailsFromDB(String username, String password, boolean b) {
+		Credentials record = credentialsRepository.getById(username);
+		if(password.equals(record.getPassword())) {
+			return populateUserDatils(record);
+		}
+		return null;
+	}
+	
+
+	private UserDetailsWithAvalabilites populateUserDatils(Credentials record) {
+		logger.info("record :{}", record);
+		userDetailsWithAvalabilites.setUserName(record.getUserName());
+		userDetailsWithAvalabilites.setPassword(record.getPassword());
+		userDetailsWithAvalabilites.setName(record.getName());
+		userDetailsWithAvalabilites.setIsMentor(record.getIsMentor());
+		userDetailsWithAvalabilites.setInterFirm(record.getInterFirm());
+		userDetailsWithAvalabilites.setFullTmOffer(record.getFullTmOffer());
+		userDetailsWithAvalabilites.setCaseName(record.getCaseName());
+		userDetailsWithAvalabilites.setAvailabilitys(new ArrayList<Availabilitys>());
+		populateAvalabilities(record, userDetailsWithAvalabilites);
+		return userDetailsWithAvalabilites;
+	}
 
 
+	private void populateAvalabilities(Credentials record, UserDetailsWithAvalabilites userDetailsWithAvalabilites2) {
+		List<Availabilities> list = availabilitiesRepository.retrieveByEmail(record.getUserName());
+		for (Availabilities availabilitie : list) {
+			Availabilitys ava = new Availabilitys();
+			ava.setStartDate(availabilitie.getAvailabilitiesId().getFrom());
+			ava.setEndDate(availabilitie.getAvailabilitiesId().getTo());
+			ava.setCaseName(availabilitie.getCases());
+			userDetailsWithAvalabilites2.getAvailabilitys().add(ava);
+		}
+		
+	}
+
+
+	@Deprecated
 	public UserDetails getDetails(String username, String password) throws IOException, CsvException {
 		try (CSVReader reader = new CSVReader(new FileReader("./src/main/resources/credentials.csv"))) {
 			List<String[]> r = reader.readAll();
@@ -37,7 +88,7 @@ public class GetUserDetailsService {
 		}
 		return null;
 	}
-
+	
 	public UserDetailsWithAvalabilites getDetails(String username, String password, boolean flag) throws IOException, CsvException, ParseException {
 		UserDetailsWithAvalabilites ava = null;
 		try (CSVReader reader = new CSVReader(new FileReader("./src/main/resources/credentials.csv"))) {
@@ -161,5 +212,8 @@ public class GetUserDetailsService {
 		return false;
 
 	}
+
+
+
 
 }

@@ -1,48 +1,39 @@
 package com.tuck.matches.service;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvException;
 import com.tuck.matches.beans.ResetPasswordBean;
+import com.tuck.matches.entities.Credentials;
+import com.tuck.matches.repository.CredentialsRepository;
 
 public class ForgotPasswordService {
 	
 	Logger logger = LoggerFactory.getLogger(ForgotPasswordService.class);
+	
+	@Autowired
+	private CredentialsRepository credentialsRepository;
+	
+	@Autowired
+	SendMailService sendMailService;
 
-	public boolean checkUserExists(String username) throws FileNotFoundException, IOException, CsvException {
-		try (CSVReader reader = new CSVReader(new FileReader("./src/main/resources/credentials.csv"))) {
-			List<String[]> r = reader.readAll();
-			for (String[] strings : r) {
-				if(this.match(strings, username )) {
-					return true;
-				}
-			}
-		}
-		return false;
-		
+	public boolean checkUserExists(String username)  {
+		Optional<Credentials> record = credentialsRepository.findById(username);
+		return record.isPresent();
 	}
-	private boolean match(String[] strings, String username) {
-		for (String string : strings) {
-			if(string.equalsIgnoreCase(username)) {
-				return true;
-			}
-		}
-		return false;
-	}
+	
 	public void generateOtp(String username) throws IOException, CsvException {
 		if(this.checkUserExists(username)) {
-			SendMailService mail = new SendMailService();
-			mail.sendMail(username);
+			sendMailService.sendMail(username);
 		}else {
 			throw new RuntimeException("Username is invalid kindly try with a valid username!");
 		}
@@ -52,7 +43,7 @@ public class ForgotPasswordService {
 	public void resetCall(ResetPasswordBean reset) throws FileNotFoundException, IOException, CsvException {
 		if(this.checkUserExists(reset.getUserName())) {
 			if(this.checkOtpValid(reset)) {
-				this.setNewPassword(reset);
+				this.setNewPasswordInDB(reset);
 			}else {
 				throw new RuntimeException("OTP is not valid kindly try again!");
 			}
@@ -61,29 +52,15 @@ public class ForgotPasswordService {
 		}
 		
 	}
-	private void setNewPassword(ResetPasswordBean reset) throws IOException, CsvException {
-		boolean isChange = false;
-		List<String[]> r = null;
-		try (CSVReader reader = new CSVReader(new FileReader("./src/main/resources/credentials.csv"))) {
-			r = reader.readAll();
-			for (String[] strings : r) {
-				if(this.match(strings, reset.getUserName())) {
-					strings[1]=reset.getPassword();
-					isChange=true;
-					break;
-				}
-			}
+	private void setNewPasswordInDB(ResetPasswordBean reset) {
+		Optional<Credentials> record = credentialsRepository.findById(reset.getUserName());
+		if(record.isPresent()){
+			Credentials cred = record.get();
+			cred.setPassword(reset.getPassword());
+			credentialsRepository.save(cred);
 		}
-		if(isChange) {
-			String fileName = "./src/main/resources/credentials.csv";
-			File file = new File(fileName);
-			FileWriter outputfile = new FileWriter(file);
-			CSVWriter writer = new CSVWriter(outputfile);
-			writer.writeAll(r);
-			writer.close();
-		}
-		
 	}
+
 	private boolean checkOtpValid(ResetPasswordBean reset) throws IOException, CsvException {
 		try (CSVReader reader = new CSVReader(new FileReader("./src/main/resources/OTP.csv"))) {
 			List<String[]> r = reader.readAll();
