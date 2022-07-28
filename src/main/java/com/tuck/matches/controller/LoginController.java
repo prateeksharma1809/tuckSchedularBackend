@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.opencsv.exceptions.CsvException;
@@ -40,6 +41,13 @@ public class LoginController {
 	
 	@Autowired
 	private SchedularService schedularService;
+	
+	@RequestMapping("/")  
+	public String hello()   
+	{  
+		return "Welcome to Tuck Schedular backend!, kindly continue from UI";  
+	} 
+	
 	
 	@Deprecated
 	@CrossOrigin(origins = Constants.ORIGIN_URL)
