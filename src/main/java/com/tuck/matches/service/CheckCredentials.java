@@ -37,7 +37,7 @@ public class CheckCredentials {
 		Optional<Credentials> record = credentialsRepository.findById(loginForm.getUserName());
 		if(record.isPresent()) {
 			Credentials cred = record.get();
-			logger.info("Should be removed : {}", cred);
+//			logger.info("Should be removed : {}", cred);
 			if(cred.getPassword().equals(loginForm.getPassword())) {
 				loginResponse.setIsAdmin(false);
 				loginResponse.setOpenPage(true);

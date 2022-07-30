@@ -45,7 +45,7 @@ public class SignUpService {
 	private void checkUserExistsInDB(String userName) {
 		Optional<Credentials> record = credentialsRepository.findById(userName);
 		if(record.isPresent()) {
-			logger.info(record.get().toString());
+//			logger.info(record.get().toString());
 			throw new RuntimeException("Username already exists, try logging in!");
 		}
 		
