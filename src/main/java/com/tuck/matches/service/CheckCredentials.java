@@ -48,9 +48,9 @@ public class CheckCredentials {
 	}
 
 	private void validate(LoginForm loginForm) {
-		if(null ==loginForm || null == loginForm.getUserName() || loginForm.getUserName().isBlank()) {
+		if(null ==loginForm || null == loginForm.getUserName() || loginForm.getUserName().isEmpty()) {
 			throw new RuntimeException("Username cannot be blank!");
-		}else if(null==loginForm.getPassword() || loginForm.getPassword().isBlank()) {
+		}else if(null==loginForm.getPassword() || loginForm.getPassword().isEmpty()) {
 			throw new RuntimeException("Password cannot be blank!");
 		}
 	}
