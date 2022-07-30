@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,7 +29,7 @@ public class SignUpService {
 
 	@Autowired
 	private Credentials credentials;
-	
+	@Deprecated
 	public void signUp(UserDetails user) throws FileNotFoundException, IOException, CsvException {
 		this.validate(user);
 		this.checkUserExists(user.getUserName());
@@ -37,7 +38,18 @@ public class SignUpService {
 	
 	public void signUpDB(UserDetails user) {
 		this.validate(user);
+		this.checkUserExistsInDB(user.getUserName());
 		this.createUserInDB(user);
+	}
+
+	private void checkUserExistsInDB(String userName) {
+		Optional<Credentials> record = credentialsRepository.findById(userName);
+		if(record.isPresent()) {
+			logger.info(record.get().toString());
+			throw new RuntimeException("Username already exists, try logging in!");
+		}
+		
+		
 	}
 
 	private void createUserInDB(UserDetails user) {
@@ -57,7 +69,7 @@ public class SignUpService {
 		}
 		return credentials;
 	}
-
+	@Deprecated
 	private void createUser(UserDetails user) throws IOException {
 		String[] arr = new String[8];
 		arr[0]=user.getUserName();
@@ -77,7 +89,7 @@ public class SignUpService {
 		writer.writeNext(arr);
 		writer.close();
 	}
-
+	@Deprecated
 	private void checkUserExists(String userName) throws FileNotFoundException, IOException, CsvException {
 		try (CSVReader reader = new CSVReader(new FileReader("./src/main/resources/credentials.csv"))) {
 			List<String[]> r = reader.readAll();

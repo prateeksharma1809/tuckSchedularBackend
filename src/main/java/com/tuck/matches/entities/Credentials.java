@@ -1,7 +1,5 @@
 package com.tuck.matches.entities;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -9,12 +7,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "credentials")
-public class Credentials implements Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class Credentials {
 
 	@Id
 	@Column(name = "EMAIL_ID")
