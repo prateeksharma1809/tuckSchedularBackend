@@ -28,7 +28,7 @@ public class CheckCredentials {
 	private CredentialsRepository credentialsRepository;
 	
 	public LoginResponse checkInDB(LoginForm loginForm) {
-		
+		validate(loginForm);
 		if(checkIfAdmin(loginForm)) {
 			loginResponse.setIsAdmin(true);
 			loginResponse.setOpenPage(false);
@@ -44,6 +44,14 @@ public class CheckCredentials {
 		}
 	
 		return loginResponse;
+	}
+
+	private void validate(LoginForm loginForm) {
+		if(null ==loginForm || null == loginForm.getUserName() || loginForm.getUserName().isBlank()) {
+			throw new RuntimeException("Username cannot be blank!");
+		}else if(null==loginForm.getPassword() || loginForm.getPassword().isBlank()) {
+			throw new RuntimeException("Password cannot be blank!");
+		}
 	}
 
 	public LoginResponse check(LoginForm loginForm) throws IOException, CsvException {
