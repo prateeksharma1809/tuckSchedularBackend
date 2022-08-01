@@ -30,8 +30,6 @@ public class GetUserDetailsService {
 	
 	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
 	
-	@Autowired
-	UserDetailsWithAvalabilites userDetailsWithAvalabilites;
 	
 	@Autowired
 	private CredentialsRepository credentialsRepository; 
@@ -50,6 +48,7 @@ public class GetUserDetailsService {
 
 	private UserDetailsWithAvalabilites populateUserDatils(Credentials record) {
 		logger.info("record :{}", record);
+		UserDetailsWithAvalabilites userDetailsWithAvalabilites = new UserDetailsWithAvalabilites();
 		userDetailsWithAvalabilites.setUserName(record.getUserName());
 		userDetailsWithAvalabilites.setPassword(record.getPassword());
 		userDetailsWithAvalabilites.setName(record.getName());
@@ -89,6 +88,7 @@ public class GetUserDetailsService {
 		return null;
 	}
 	
+	@Deprecated
 	public UserDetailsWithAvalabilites getDetails(String username, String password, boolean flag) throws IOException, CsvException, ParseException {
 		UserDetailsWithAvalabilites ava = null;
 		try (CSVReader reader = new CSVReader(new FileReader("./src/main/resources/credentials.csv"))) {
@@ -132,7 +132,8 @@ public class GetUserDetailsService {
 		availability.setEndDate(formatter.parse(strings[2]));
 		ava.getAvailabilitys().add(availability);
 	}
-
+	
+	@Deprecated
 	private UserDetails populateUserDatils(String[] strings) {
 		logger.info(Arrays.toString(strings));
 		UserDetails userDetails = new UserDetails();
@@ -166,6 +167,7 @@ public class GetUserDetailsService {
 		return userDetails;
 	}
 	
+	@Deprecated
 	private UserDetailsWithAvalabilites populateUserDatils(String[] strings, boolean flag) {
 		logger.info(Arrays.toString(strings));
 		UserDetailsWithAvalabilites userDetails = new UserDetailsWithAvalabilites();
@@ -199,6 +201,7 @@ public class GetUserDetailsService {
 		return userDetails;
 	}
 
+	@Deprecated
 	private boolean match(String[] cred, String user, String password) {
 		logger.info(Arrays.toString(cred));
 		logger.info(user);

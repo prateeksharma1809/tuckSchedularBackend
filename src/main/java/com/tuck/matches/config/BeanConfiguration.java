@@ -4,13 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
-import com.tuck.matches.beans.LoginForm;
-import com.tuck.matches.beans.LoginResponse;
-import com.tuck.matches.beans.UserDetails;
-import com.tuck.matches.beans.UserDetailsWithAvalabilites;
-import com.tuck.matches.entities.Availabilities;
-import com.tuck.matches.entities.AvailabilitiesId;
-import com.tuck.matches.entities.Credentials;
 import com.tuck.matches.service.CheckCredentials;
 import com.tuck.matches.service.EditProfileService;
 import com.tuck.matches.service.ForgotPasswordService;
@@ -30,11 +23,7 @@ public class BeanConfiguration {
 		return new SchedularService();
 	}
 	
-	@Bean
-	@Scope("prototype")
-	public UserDetails userDetails() {
-		return new UserDetails();
-	}
+
 	
 	@Bean
 	@Scope("prototype")
@@ -42,12 +31,7 @@ public class BeanConfiguration {
 		return new RegisterAvailabilities();
 	}
 	
-	@Bean
-	@Scope("prototype")
-	public Availabilities availabilities() {
-		return new Availabilities();
-	}
-	
+
 	@Bean
 	@Scope("prototype")
 	public SendMailService sendMailService(){
@@ -59,37 +43,14 @@ public class BeanConfiguration {
 	public EditProfileService editProfileService(){
 		return new EditProfileService();
 	}
-	
-	@Bean
-	@Scope("prototype")
-	public AvailabilitiesId availabilitiesId() {
-		return new AvailabilitiesId();
-	}
+
 
 	@Bean
 	@Scope("prototype")
 	public ForgotPasswordService forgotPasswordService() {
 		return new ForgotPasswordService();
 	}
-	
-	@Bean
-	@Scope("prototype")
-	public UserDetailsWithAvalabilites userDetailsWithAvalabilites() {
-		return new UserDetailsWithAvalabilites();
-	}
-	
-	
-	@Bean
-	@Scope("prototype")
-	public LoginForm loginForm() {
-		return new LoginForm();
-	}
-	
-	@Bean
-	@Scope("prototype")
-	public LoginResponse loginResponse() {
-		return new LoginResponse();
-	}
+
 	
 	@Bean
 	@Scope("prototype")
@@ -111,12 +72,47 @@ public class BeanConfiguration {
 		return new SignUpService();
 	}
 	
-	@Bean
-	@Scope("prototype")
-	public Credentials credentials() {
-		return new Credentials();
-	}
-
-
+	
+//	@Bean
+//	@Scope("prototype")
+//	public UserDetails userDetails() {
+//		return new UserDetails();
+//	}
+//	
+//	@Bean
+//	@Scope("prototype")
+//	public Credentials credentials() {
+//		return new Credentials();
+//	}
+	
+//	@Bean
+//	@Scope("prototype")
+//	public UserDetailsWithAvalabilites userDetailsWithAvalabilites() {
+//		return new UserDetailsWithAvalabilites();
+//	}
+//	
+	
+//	@Bean
+//	@Scope("prototype")
+//	public LoginForm loginForm() {
+//		return new LoginForm();
+//	}
+//	
+//	@Bean
+//	@Scope("prototype")
+//	public LoginResponse loginResponse() {
+//		return new LoginResponse();
+//	}
+	
+//	@Bean
+//	@Scope("prototype")
+//	public AvailabilitiesId availabilitiesId() {
+//		return new AvailabilitiesId();
+//	}
+//	@Bean
+//	@Scope("prototype")
+//	public Availabilities availabilities() {
+//		return new Availabilities();
+//	}
 	
 }

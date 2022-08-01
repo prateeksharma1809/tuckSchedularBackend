@@ -22,13 +22,11 @@ public class CheckCredentials {
 	Logger logger = LoggerFactory.getLogger(CheckCredentials.class);
 	
 	@Autowired
-	private LoginResponse loginResponse;
-	
-	@Autowired
 	private CredentialsRepository credentialsRepository;
 	
 	public LoginResponse checkInDB(LoginForm loginForm) {
 		validate(loginForm);
+		LoginResponse loginResponse = new LoginResponse();
 		if(checkIfAdmin(loginForm)) {
 			loginResponse.setIsAdmin(true);
 			loginResponse.setOpenPage(false);

@@ -32,21 +32,13 @@ public class RegisterAvailabilities {
 	private CheckCredentials checkCred;
 	
 	@Autowired
-	private Availabilities availabilities;
-	
-	@Autowired
-	private AvailabilitiesId availabilitiesId;
-	
-	@Autowired
-	private LoginForm loginForm;
-	
-	@Autowired
 	private AvailabilitiesRepository availabilitiesRepository;
 
 	Logger logger = LoggerFactory.getLogger(EditProfileService.class);
 
 	public void registerInDB(Availabilitys availabilitys) {
 		this.validate(availabilitys);
+		AvailabilitiesId availabilitiesId = new AvailabilitiesId();
 		availabilitiesId.setUserName(availabilitys.getUserName());
 		Date startdate = availabilitys.getStartDate();
 		Date enddate = availabilitys.getEndDate();
@@ -57,6 +49,7 @@ public class RegisterAvailabilities {
 		}
 		availabilitiesId.setFrom(availabilitys.getStartDate());
 		availabilitiesId.setTo(availabilitys.getEndDate());
+		Availabilities availabilities = new Availabilities();
 		availabilities.setAvailabilitiesId(availabilitiesId);
 		availabilities.setIsMentor(availabilitys.getIsMentor());
 		StringBuilder strbuild = new StringBuilder();
@@ -121,6 +114,7 @@ public class RegisterAvailabilities {
 	}
 
 	private LoginForm getLoginForm(Availabilitys availabilitys) {
+		LoginForm loginForm = new LoginForm();
 		loginForm.setUserName(availabilitys.getUserName());
 		loginForm.setPassword(availabilitys.getPassword());
 		return loginForm;
@@ -129,6 +123,7 @@ public class RegisterAvailabilities {
 	
 	public void deleteEntryInDB(Availabilitys availabilitys)  {
 		this.validate(availabilitys);
+		AvailabilitiesId availabilitiesId = new AvailabilitiesId();
 		availabilitiesId.setUserName(availabilitys.getUserName());
 		availabilitiesId.setFrom(availabilitys.getStartDate());
 		availabilitiesId.setTo(availabilitys.getEndDate());

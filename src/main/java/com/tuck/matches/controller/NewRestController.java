@@ -63,6 +63,7 @@ public class NewRestController {
 		if(!loginResponse.getIsAdmin() && !loginResponse.getOpenPage()) {
 			throw new RuntimeException("User Name or Password incorrect!");
 		}
+		logger.info(loginResponse.toString());
 		return loginResponse;
 	}
 

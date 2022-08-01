@@ -26,15 +26,6 @@ public class SignUpService {
 	
 	@Autowired
 	private CredentialsRepository credentialsRepository;
-
-	@Autowired
-	private Credentials credentials;
-	@Deprecated
-	public void signUp(UserDetails user) throws FileNotFoundException, IOException, CsvException {
-		this.validate(user);
-		this.checkUserExists(user.getUserName());
-		this.createUser(user);
-	}
 	
 	public void signUpDB(UserDetails user) {
 		this.validate(user);
@@ -45,7 +36,6 @@ public class SignUpService {
 	private void checkUserExistsInDB(String userName) {
 		Optional<Credentials> record = credentialsRepository.findById(userName);
 		if(record.isPresent()) {
-//			logger.info(record.get().toString());
 			throw new RuntimeException("Username already exists, try logging in!");
 		}
 		
@@ -58,6 +48,7 @@ public class SignUpService {
 	}
 
 	private Credentials createCredentialObject(UserDetails user) {
+		Credentials credentials = new Credentials();
 		credentials.setUserName(user.getUserName());
 		credentials.setPassword(user.getPassword());
 		credentials.setName(user.getName());
@@ -69,6 +60,33 @@ public class SignUpService {
 		}
 		return credentials;
 	}
+	
+
+	private void validate(UserDetails user) {
+		if (null == user.getUserName() || user.getUserName().isEmpty()) {
+			throw new RuntimeException("Username should not be empty!");
+		} else if (null == user.getPassword() || user.getPassword().isEmpty()) {
+			throw new RuntimeException("Password should not be empty!");
+		} else if (null == user.getName() || user.getName().isEmpty()) {
+			throw new RuntimeException("Name should not be empty!");
+		} else if (user.getIsMentor() && (null == user.getInterFirm() || user.getInterFirm().isEmpty())) {
+			throw new RuntimeException("Internship Firm name should not be empty!");
+		}else {
+			validateEmail(user.getUserName());
+		}
+	}
+
+	private void validateEmail(String userName) {
+		String regex = "^(.+)@(.+)$";  
+		 Pattern pattern = Pattern.compile(regex);  
+		 Matcher matcher = pattern.matcher(userName);  
+		 if(!matcher.matches()) {
+			 throw new RuntimeException("Email not valid!");
+		 }
+		
+	}
+	
+	
 	@Deprecated
 	private void createUser(UserDetails user) throws IOException {
 		String[] arr = new String[8];
@@ -101,28 +119,11 @@ public class SignUpService {
 		}
 	}
 
-	private void validate(UserDetails user) {
-		if (null == user.getUserName() || user.getUserName().isEmpty()) {
-			throw new RuntimeException("Username should not be empty!");
-		} else if (null == user.getPassword() || user.getPassword().isEmpty()) {
-			throw new RuntimeException("Password should not be empty!");
-		} else if (null == user.getName() || user.getName().isEmpty()) {
-			throw new RuntimeException("Name should not be empty!");
-		} else if (user.getIsMentor() && (null == user.getInterFirm() || user.getInterFirm().isEmpty())) {
-			throw new RuntimeException("Internship Firm name should not be empty!");
-		}else {
-			validateEmail(user.getUserName());
-		}
-	}
-
-	private void validateEmail(String userName) {
-		String regex = "^(.+)@(.+)$";  
-		 Pattern pattern = Pattern.compile(regex);  
-		 Matcher matcher = pattern.matcher(userName);  
-		 if(!matcher.matches()) {
-			 throw new RuntimeException("Email not valid!");
-		 }
-		
+	@Deprecated
+	public void signUp(UserDetails user) throws FileNotFoundException, IOException, CsvException {
+		this.validate(user);
+		this.checkUserExists(user.getUserName());
+		this.createUser(user);
 	}
 
 }
