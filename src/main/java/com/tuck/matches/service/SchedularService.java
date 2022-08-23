@@ -90,13 +90,13 @@ public class SchedularService {
 			List<Availabilities> mentorAvailabilities) {
 		List<Availabilities> availableMentors = new ArrayList<>();
 		for (Availabilities mentor : mentorAvailabilities) {
-			if(!mentor.getIsMatched()) {
+			if(mentor.getIsMatched()!=null && !mentor.getIsMatched()) {
 				availableMentors.add(mentor);
 			}
 		}
 		if(!availableMentors.isEmpty()) {
 			for (Availabilities mentee : menteeAvailabilities) {
-				if(!mentee.getIsMatched()) {
+				if(null != mentee.getIsMatched() && !mentee.getIsMatched()) {
 					String body = "Hi Mentee, \n Your time slot does not coincide with any available mentor time slot,"
 							+ "\n Don't worry we got you covered. Below are some slots still available.\n";
 					for(Availabilities mentorAva : availableMentors) {
