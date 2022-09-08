@@ -18,13 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.opencsv.CSVWriter;
+import com.tuck.matches.beans.Constants;
 
 public class SendMailService {
 	Logger logger = LoggerFactory.getLogger(SendMailService.class);
 	
 	public void sendMail(String to, String subject, String body) {
-		String from = "prateekrichu@gmail.com";
-		String password = "febacrytcqgfcutt";
+		String from = Constants.EMAIL_ID;
+		String password = Constants.PASSWORD;
 		// Assuming you are sending email from through gmails smtp
         String host = "smtp.gmail.com";
 
@@ -86,8 +87,8 @@ public class SendMailService {
 	
 //	public void sendMail() {
 	public void sendMail(String to) throws IOException {
-		String from = "prateekrichu@gmail.com";
-		String password = "febacrytcqgfcutt";
+		String from = Constants.EMAIL_ID;
+		String password = Constants.PASSWORD;
 		logger.info("from :{}, password :{}", from, password);
 		
         String otp = this.getRandomNumberString();
