@@ -104,11 +104,13 @@ public class SchedularService {
 			for (Availabilities mentee : menteeAvailabilities) {
 				if (null == mentee.getIsMatched() || !mentee.getIsMatched()) {
 					String body = "Hi Mentee, \n Your time slot does not coincide with any available mentor time slot,"
-							+ "\n Don't worry we got you covered. Below are some slots still available.\n";
+							+ "\n Don't worry we got you covered. Below are some slots still available.\n-----------------------------------------------------------------";
 					for (Availabilities mentorAva : availableMentors) {
-						body += "\n Email: " + mentorAva.getAvailabilitiesId().getUserName() + "\t Available from : "
+						Credentials mentorCred = credentialsRepository.getById(mentorAva.getAvailabilitiesId().getUserName());
+						body += "\n Email: " + mentorAva.getAvailabilitiesId().getUserName() +"\t Name: "+ mentorCred.getName()+ "\n Available from : "
 								+ simpleDateFormat.format(mentorAva.getAvailabilitiesId().getFrom()) + ", till: "
-								+ simpleDateFormat.format(mentorAva.getAvailabilitiesId().getTo());
+								+ simpleDateFormat.format(mentorAva.getAvailabilitiesId().getTo())
+								+"/n-----------------------------------------------------------------";
 					}
 					logger.info("body : {}", body);
 					sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(), "Hurry!", body);
