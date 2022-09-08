@@ -163,6 +163,14 @@ public class SchedularService {
 
 	private boolean checkAlreadyMatched2Times(Availabilities menteeAva, Availabilities mentorAva, List<Matches> matchesRecord) {
 		int i = 0;
+		if(null!=menteeAva.getIsMatched() && menteeAva.getIsMatched()) {
+			logger.info("Mentee time slot already matched");
+			return true;
+		}
+		if(null!=mentorAva.getIsMatched() && mentorAva.getIsMatched()) {
+			logger.info("Mentee time slot already matched");
+			return true;
+		}
 		for (Matches matches : matchesRecord) {
 			if(matches.getMatchesId().getEmail_mentee().equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName()) 
 					&& matches.getMatchesId().getEmail_mentor().equalsIgnoreCase(mentorAva.getAvailabilitiesId().getUserName())) {
