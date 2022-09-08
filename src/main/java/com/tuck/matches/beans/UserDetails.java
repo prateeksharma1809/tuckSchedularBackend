@@ -10,6 +10,7 @@ public class UserDetails {
 	private Boolean isMentor=false;
 	private String numberOfMatches;
 	private String caseName;
+	private String officeLoc;
 	
 
 	public String getNumberOfMatches() {
@@ -75,6 +76,8 @@ public class UserDetails {
 		builder.append(numberOfMatches);
 		builder.append(", caseName=");
 		builder.append(caseName);
+		builder.append(", officeLoc=");
+		builder.append(officeLoc);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -83,6 +86,12 @@ public class UserDetails {
 	}
 	public void setCaseName(String caseName) {
 		this.caseName = caseName;
+	}
+	public String getOfficeLoc() {
+		return officeLoc;
+	}
+	public void setOfficeLoc(String officeLoc) {
+		this.officeLoc = officeLoc;
 	}
 	
 	

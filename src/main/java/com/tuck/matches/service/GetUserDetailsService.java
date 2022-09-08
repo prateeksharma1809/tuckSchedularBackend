@@ -57,6 +57,7 @@ public class GetUserDetailsService {
 		userDetailsWithAvalabilites.setFullTmOffer(record.getFullTmOffer());
 		userDetailsWithAvalabilites.setCaseName(record.getCaseName());
 		userDetailsWithAvalabilites.setAvailabilitys(new ArrayList<Availabilitys>());
+		userDetailsWithAvalabilites.setOfficeLoc(record.getOfficeLocation());
 		populateAvalabilities(record, userDetailsWithAvalabilites);
 		return userDetailsWithAvalabilites;
 	}

@@ -57,6 +57,7 @@ public class SignUpService {
 			credentials.setInterFirm(user.getInterFirm());
 			credentials.setFullTmOffer(user.getFullTmOffer());
 			credentials.setCaseName(user.getCaseName());
+			credentials.setOfficeLocation(user.getOfficeLoc());
 		}
 		return credentials;
 	}

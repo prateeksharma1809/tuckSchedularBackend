@@ -31,6 +31,9 @@ public class Credentials {
 	@Column(name = "CASE_NAME")
 	private String caseName;
 	
+	@Column(name = "OFFICE_LOCATION")
+	private String officeLocation;
+	
 	public String getName() {
 		return name;
 	}
@@ -80,7 +83,7 @@ public class Credentials {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("UserDetails [userName=");
+		builder.append("Credentials [userName=");
 		builder.append(userName);
 		builder.append(", password=");
 		builder.append(password);
@@ -94,8 +97,16 @@ public class Credentials {
 		builder.append(isMentor);
 		builder.append(", caseName=");
 		builder.append(caseName);
+		builder.append(", officeLocation=");
+		builder.append(officeLocation);
 		builder.append("]");
 		return builder.toString();
+	}
+	public String getOfficeLocation() {
+		return officeLocation;
+	}
+	public void setOfficeLocation(String officeLocation) {
+		this.officeLocation = officeLocation;
 	}
 
 	

@@ -155,6 +155,8 @@ public class SchedularService {
 				body += "\n " + mentorCred.getName() + " has done internship at :\n" + mentorCred.getInterFirm();
 			if (null != mentorCred.getFullTmOffer() && !mentorCred.getFullTmOffer().isEmpty())
 				body += "\n and is holding a full time offer from :\n" + mentorCred.getFullTmOffer();
+			if (null != mentorCred.getOfficeLocation() && !mentorCred.getOfficeLocation().isEmpty())
+				body += ", office location " + mentorCred.getOfficeLocation();
 			if (null != mentorCred.getCaseName() && !mentorCred.getCaseName().isEmpty())
 				body += "\n the list of cases are :\n" + mentorCred.getCaseName();
 			logger.info("mentee body : {}", body);

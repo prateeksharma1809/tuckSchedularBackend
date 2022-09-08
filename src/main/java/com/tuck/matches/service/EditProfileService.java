@@ -26,6 +26,7 @@ public class EditProfileService {
 		cred.setInterFirm(user.getInterFirm());
 		cred.setFullTmOffer(user.getFullTmOffer());
 		cred.setCaseName(user.getCaseName());
+		cred.setOfficeLocation(user.getOfficeLoc());
 		credentialsRepository.save(cred);
 	}	
 }
