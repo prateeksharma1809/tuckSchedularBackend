@@ -103,8 +103,10 @@ public class SchedularService {
 		if (!availableMentors.isEmpty()) {
 			for (Availabilities mentee : menteeAvailabilities) {
 				if (null == mentee.getIsMatched() || !mentee.getIsMatched()) {
-					String body = "Hi Mentee, \n Your time slot does not coincide with any available mentor time slot,"
-							+ "\n Don't worry we got you covered. Below are some slots still available.\n-----------------------------------------------------------------";
+					String body = "Hi Mentee, \n Your available time slots do not coincide with any available mentor slots,"
+							+ "\n Don't worry, there are additional slots available as below."
+							+ "\n Please reach out to the mentors if any of these work for you"
+							+ "\n-----------------------------------------------------------------";
 					for (Availabilities mentorAva : availableMentors) {
 						Credentials mentorCred = credentialsRepository.getById(mentorAva.getAvailabilitiesId().getUserName());
 						body += "\n Email: " + mentorAva.getAvailabilitiesId().getUserName() +"\t Name: "+ mentorCred.getName()+ "\n Available from : "
@@ -113,7 +115,16 @@ public class SchedularService {
 								+"/n-----------------------------------------------------------------";
 					}
 					logger.info("body : {}", body);
-					sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(), "Hurry!", body);
+					sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(), "Sorry, we were not able to find a case slot", body);
+				}
+			}
+		}else {
+			for (Availabilities mentee : menteeAvailabilities) {
+				if (null == mentee.getIsMatched() || !mentee.getIsMatched()) {
+					String body = "Hi Mentee, \n Your available time slots do not coincide with any available mentor slots,"
+							+ "\n Please try again next week!";
+					logger.info("body : {}", body);
+					sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(), "Sorry, we were not able to find a case slot", body);
 				}
 			}
 		}
@@ -126,28 +137,28 @@ public class SchedularService {
 			Credentials menteeCred = credentialsRepository.getById(matches.getMatchesId().getEmail_mentee());
 
 			String body = "Hi " + mentorCred.getName() + ",\n You are matched with : " + menteeCred.getName()
-					+ ", Email : " + matches.getMatchesId().getEmail_mentee() + " \nfrom : "
+					+ ", Email : " + matches.getMatchesId().getEmail_mentee() + " \nfor the time slot  : "
 					+ simpleDateFormat.format(matches.getMatchesId().getFrom()) + " to : "
 					+ simpleDateFormat.format(matches.getMatchesId().getTo());
 			if (!matches.getCases().isEmpty()) {
-				body += " common case type is : " + matches.getCases();
+				body += " the mentee would prefer the case type : " + matches.getCases();
 			}
 			logger.info("mentor body : {}", body);
-			sendMailService.sendMail(matches.getMatchesId().getEmail_mentor(), "Case and time Matched", body);
+			sendMailService.sendMail(matches.getMatchesId().getEmail_mentor(), "You were matched with a mentee!", body);
 			body = "Hi " + menteeCred.getName() + ",\n You are matched with : " + mentorCred.getName() + ", Email : "
-					+ matches.getMatchesId().getEmail_mentor() + " \nfrom : "
+					+ matches.getMatchesId().getEmail_mentor() + " \nfor the time slot : "
 					+ simpleDateFormat.format(matches.getMatchesId().getFrom()) + " to: "
 					+ simpleDateFormat.format(matches.getMatchesId().getTo());
 			if (!matches.getCases().isEmpty())
-				body += " common case type is : " + matches.getCases();
+				body += " the available case type is : " + matches.getCases();
 			if (null != mentorCred.getInterFirm() && !mentorCred.getInterFirm().isEmpty())
-				body += "\n " + mentorCred.getName() + " has done internship from :\n" + mentorCred.getInterFirm();
+				body += "\n " + mentorCred.getName() + " has done internship at :\n" + mentorCred.getInterFirm();
 			if (null != mentorCred.getFullTmOffer() && !mentorCred.getFullTmOffer().isEmpty())
-				body += "\n is holding a full time offer from :\n" + mentorCred.getFullTmOffer();
+				body += "\n and is holding a full time offer from :\n" + mentorCred.getFullTmOffer();
 			if (null != mentorCred.getCaseName() && !mentorCred.getCaseName().isEmpty())
-				body += "\n Cases are :\n" + mentorCred.getCaseName();
+				body += "\n the list of cases are :\n" + mentorCred.getCaseName();
 			logger.info("mentee body : {}", body);
-			sendMailService.sendMail(matches.getMatchesId().getEmail_mentee(), "Case and time Matched", body);
+			sendMailService.sendMail(matches.getMatchesId().getEmail_mentee(), "You were matched with a mentor!", body);
 		}
 
 	}
