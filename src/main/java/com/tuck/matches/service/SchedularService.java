@@ -64,7 +64,7 @@ public class SchedularService {
 							.compareTo(menteeAva.getAvailabilitiesId().getFrom()) >= 0
 							&& mentorAva.getAvailabilitiesId().getTo()
 									.compareTo(menteeAva.getAvailabilitiesId().getTo()) <= 0
-							&& !checkAlreadyMatched2Times(menteeAva, mentorAva, matchesRecord)) {
+							&& !checkAlreadyMatched2Times(menteeAva, mentorAva, matchesRecord, newMatches)) {
 						MatchesId matchedId = new MatchesId();
 						matchedId.setEmail_mentee(menteeAva.getAvailabilitiesId().getUserName());
 						matchedId.setEmail_mentor(mentorAva.getAvailabilitiesId().getUserName());
@@ -184,7 +184,7 @@ public class SchedularService {
 	}
 
 	private boolean checkAlreadyMatched2Times(Availabilities menteeAva, Availabilities mentorAva,
-			List<Matches> matchesRecord) {
+			List<Matches> matchesRecord, List<Matches> newMatches) {
 		int i = 0;
 		if (null != menteeAva.getIsMatched() && menteeAva.getIsMatched()) {
 			logger.info("Mentee time slot already matched");
@@ -193,6 +193,13 @@ public class SchedularService {
 		if (null != mentorAva.getIsMatched() && mentorAva.getIsMatched()) {
 			logger.info("Mentee time slot already matched");
 			return true;
+		}
+		for(Matches matches : newMatches) {
+			if (matches.getMatchesId().getEmail_mentee().equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName())
+					&& matches.getMatchesId().getEmail_mentor()
+							.equalsIgnoreCase(mentorAva.getAvailabilitiesId().getUserName())) {
+				return true;
+			}
 		}
 		for (Matches matches : matchesRecord) {
 			if (matches.getMatchesId().getEmail_mentee().equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName())
