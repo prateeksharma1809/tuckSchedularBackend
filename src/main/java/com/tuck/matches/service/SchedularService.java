@@ -185,7 +185,6 @@ public class SchedularService {
 
 	private boolean checkAlreadyMatched2Times(Availabilities menteeAva, Availabilities mentorAva,
 			List<Matches> matchesRecord, List<Matches> newMatches) {
-		int i = 0;
 		if (null != menteeAva.getIsMatched() && menteeAva.getIsMatched()) {
 			logger.info("Mentee time slot already matched");
 			return true;
@@ -194,13 +193,20 @@ public class SchedularService {
 			logger.info("Mentee time slot already matched");
 			return true;
 		}
+		/**
+		 * for checking that there are only 2 matches per mentee per cycle
+		 * */
+		int countOfMatchesMenteePerCycle = 0;
 		for(Matches matches : newMatches) {
-			if (matches.getMatchesId().getEmail_mentee().equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName())
-					&& matches.getMatchesId().getEmail_mentor()
-							.equalsIgnoreCase(mentorAva.getAvailabilitiesId().getUserName())) {
-				return true;
+			if (matches.getMatchesId().getEmail_mentee().equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName())) {
+				countOfMatchesMenteePerCycle++;
 			}
 		}
+		if(countOfMatchesMenteePerCycle>=2) {
+			logger.info("Mentee already paired 2 times in this cycle");
+			return true;
+		}
+		int i = 0;
 		for (Matches matches : matchesRecord) {
 			if (matches.getMatchesId().getEmail_mentee().equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName())
 					&& matches.getMatchesId().getEmail_mentor()
