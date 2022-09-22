@@ -59,79 +59,117 @@ public class SchedularService {
 		List<Matches> newMatches = new ArrayList<Matches>();
 		if (null != mentorAvailabilities && null != menteeAvailabilities && !mentorAvailabilities.isEmpty()
 				&& !menteeAvailabilities.isEmpty()) {
-			 Collections.shuffle(mentorAvailabilities);
-			 Collections.shuffle(menteeAvailabilities);
-			for (Availabilities mentorAva : mentorAvailabilities) {
-				for (Availabilities menteeAva : menteeAvailabilities) {
-					if (mentorAva.getAvailabilitiesId().getFrom()
-							.compareTo(menteeAva.getAvailabilitiesId().getFrom()) >= 0
-							&& mentorAva.getAvailabilitiesId().getTo()
-									.compareTo(menteeAva.getAvailabilitiesId().getTo()) <= 0
-							&& !checkAlreadyMatched2Times(menteeAva, mentorAva, matchesRecord, newMatches)) {
-						MatchesId matchedId = new MatchesId();
-						matchedId.setEmail_mentee(menteeAva.getAvailabilitiesId().getUserName());
-						matchedId.setEmail_mentor(mentorAva.getAvailabilitiesId().getUserName());
-						matchedId.setFrom(mentorAva.getAvailabilitiesId().getFrom());
-						matchedId.setTo(mentorAva.getAvailabilitiesId().getTo());
-						Matches matches = new Matches();
-						String cases = checkCasesMatched(menteeAva, mentorAva);
-						matches.setMatchesId(matchedId);
-						matches.setCases(cases);
-						menteeAva.setIsMatched(true);
-						mentorAva.setIsMatched(true);
-						newMatches.add(matches);
-						matchesRecord.add(matches);
+			Collections.shuffle(mentorAvailabilities);
+			Collections.shuffle(menteeAvailabilities);
+			for (int iteraion = 1; iteraion <= 2; iteraion++) {
+				for (Availabilities mentorAva : mentorAvailabilities) {
+					for (Availabilities menteeAva : menteeAvailabilities) {
+						if (mentorAva.getAvailabilitiesId().getFrom()
+								.compareTo(menteeAva.getAvailabilitiesId().getFrom()) >= 0
+								&& mentorAva.getAvailabilitiesId().getTo()
+										.compareTo(menteeAva.getAvailabilitiesId().getTo()) <= 0
+								&& !checkAlreadyMatched2Times(menteeAva, mentorAva, matchesRecord, newMatches, iteraion)) {
+							MatchesId matchedId = new MatchesId();
+							matchedId.setEmail_mentee(menteeAva.getAvailabilitiesId().getUserName());
+							matchedId.setEmail_mentor(mentorAva.getAvailabilitiesId().getUserName());
+							matchedId.setFrom(mentorAva.getAvailabilitiesId().getFrom());
+							matchedId.setTo(mentorAva.getAvailabilitiesId().getTo());
+							Matches matches = new Matches();
+							String cases = checkCasesMatched(menteeAva, mentorAva);
+							matches.setMatchesId(matchedId);
+							matches.setCases(cases);
+							menteeAva.setIsMatched(true);
+							mentorAva.setIsMatched(true);
+							newMatches.add(matches);
+							matchesRecord.add(matches);
+							break;
+						}
 					}
-				}
 
+				}
 			}
 		}
 		if (!newMatches.isEmpty()) {
 			sendMailToMatched(newMatches);
 		}
-		sendMailToUnmatchedMentees(menteeAvailabilities, mentorAvailabilities);
+		sendMailToUnmatchedMentees(menteeAvailabilities, mentorAvailabilities, newMatches);
 		matchesJpaRepository.saveAll(matchesRecord);
 		availabilitiesRepository.deleteAll();
 
 	}
 
 	private void sendMailToUnmatchedMentees(List<Availabilities> menteeAvailabilities,
-			List<Availabilities> mentorAvailabilities) {
+			List<Availabilities> mentorAvailabilities, List<Matches> newMatches) {
 		List<Availabilities> availableMentors = new ArrayList<>();
 		for (Availabilities mentor : mentorAvailabilities) {
 			if (mentor.getIsMatched() == null || !mentor.getIsMatched()) {
 				availableMentors.add(mentor);
 			}
 		}
+		List<Availabilities> uniqueMentees = createUniqueMenteeList(menteeAvailabilities, newMatches);
 		if (!availableMentors.isEmpty()) {
-			for (Availabilities mentee : menteeAvailabilities) {
+			for (Availabilities mentee : uniqueMentees) {
 				if (null == mentee.getIsMatched() || !mentee.getIsMatched()) {
 					String body = "Hi Mentee, \n Your available time slots do not coincide with any available mentor slots,"
 							+ "\n Don't worry, there are additional slots available as below."
 							+ "\n Please reach out to the mentors if any of these work for you"
 							+ "\n-----------------------------------------------------------------";
 					for (Availabilities mentorAva : availableMentors) {
-						Credentials mentorCred = credentialsRepository.getById(mentorAva.getAvailabilitiesId().getUserName());
-						body += "\n Email: " + mentorAva.getAvailabilitiesId().getUserName() +"\t Name: "+ mentorCred.getName()+ "\n Available from : "
+						Credentials mentorCred = credentialsRepository
+								.getById(mentorAva.getAvailabilitiesId().getUserName());
+						body += "\n Email: " + mentorAva.getAvailabilitiesId().getUserName() + "\t Name: "
+								+ mentorCred.getName() + "\n Available from : "
 								+ simpleDateFormat.format(mentorAva.getAvailabilitiesId().getFrom()) + ", till: "
 								+ simpleDateFormat.format(mentorAva.getAvailabilitiesId().getTo())
-								+"/n-----------------------------------------------------------------";
+								+ "/n-----------------------------------------------------------------";
 					}
 					logger.info("body : {}", body);
-					sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(), "Sorry, we were not able to find a case slot", body);
+					sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(),
+							"Sorry, we were not able to find a case slot", body);
 				}
 			}
-		}else {
-			for (Availabilities mentee : menteeAvailabilities) {
+		} else {
+			for (Availabilities mentee : uniqueMentees) {
 				if (null == mentee.getIsMatched() || !mentee.getIsMatched()) {
 					String body = "Hi Mentee, \n Your available time slots do not coincide with any available mentor slots,"
 							+ "\n Please try again next week!";
 					logger.info("body : {}", body);
-					sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(), "Sorry, we were not able to find a case slot", body);
+					sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(),
+							"Sorry, we were not able to find a case slot", body);
 				}
 			}
 		}
 
+	}
+
+	private List<Availabilities> createUniqueMenteeList(List<Availabilities> menteeAvailabilities,
+			List<Matches> newMatches) {
+		List<Availabilities> UniqueMentee = new ArrayList<>();
+		for (Availabilities mentee : menteeAvailabilities) {
+			boolean found = false;
+			for (Matches matches : newMatches) {
+				if (matches.getMatchesId().getEmail_mentee()
+						.equalsIgnoreCase(mentee.getAvailabilitiesId().getUserName())) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				boolean isPrresentInList = false;
+				for (Availabilities availabilities : UniqueMentee) {
+					if (availabilities.getAvailabilitiesId().getUserName()
+							.equalsIgnoreCase(mentee.getAvailabilitiesId().getUserName())) {
+						isPrresentInList = true;
+					}
+
+				}
+				if (!isPrresentInList) {
+					UniqueMentee.add(mentee);
+				}
+
+			}
+		}
+		return UniqueMentee;
 	}
 
 	private void sendMailToMatched(List<Matches> newMatches) {
@@ -187,7 +225,7 @@ public class SchedularService {
 	}
 
 	private boolean checkAlreadyMatched2Times(Availabilities menteeAva, Availabilities mentorAva,
-			List<Matches> matchesRecord, List<Matches> newMatches) {
+			List<Matches> matchesRecord, List<Matches> newMatches, int iteraion) {
 		if (null != menteeAva.getIsMatched() && menteeAva.getIsMatched()) {
 			logger.info("Mentee time slot already matched");
 			return true;
@@ -199,7 +237,7 @@ public class SchedularService {
 		/**
 		 * for each week the match should not be with same mentor
 		 */
-		for(Matches matches : newMatches) {
+		for (Matches matches : newMatches) {
 			if (matches.getMatchesId().getEmail_mentee().equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName())
 					&& matches.getMatchesId().getEmail_mentor()
 							.equalsIgnoreCase(mentorAva.getAvailabilitiesId().getUserName())) {
@@ -208,17 +246,19 @@ public class SchedularService {
 		}
 		/**
 		 * for checking that there are only 2 matches per mentee per cycle
-		 * */
+		 */
 		int countOfMatchesMenteePerCycle = 0;
-		for(Matches matches : newMatches) {
-			if (matches.getMatchesId().getEmail_mentee().equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName())) {
+		for (Matches matches : newMatches) {
+			if (matches.getMatchesId().getEmail_mentee()
+					.equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName())) {
 				countOfMatchesMenteePerCycle++;
+				if (countOfMatchesMenteePerCycle >= iteraion) {
+					logger.info("Mentee already paired "+iteraion+" times in this cycle");
+					return true;
+				}
 			}
 		}
-		if(countOfMatchesMenteePerCycle>=2) {
-			logger.info("Mentee already paired 2 times in this cycle");
-			return true;
-		}
+		
 		int i = 0;
 		for (Matches matches : matchesRecord) {
 			if (matches.getMatchesId().getEmail_mentee().equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName())
