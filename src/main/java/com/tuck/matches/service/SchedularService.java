@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -58,6 +59,8 @@ public class SchedularService {
 		List<Matches> newMatches = new ArrayList<Matches>();
 		if (null != mentorAvailabilities && null != menteeAvailabilities && !mentorAvailabilities.isEmpty()
 				&& !menteeAvailabilities.isEmpty()) {
+			 Collections.shuffle(mentorAvailabilities);
+			 Collections.shuffle(menteeAvailabilities);
 			for (Availabilities mentorAva : mentorAvailabilities) {
 				for (Availabilities menteeAva : menteeAvailabilities) {
 					if (mentorAva.getAvailabilitiesId().getFrom()
@@ -192,6 +195,16 @@ public class SchedularService {
 		if (null != mentorAva.getIsMatched() && mentorAva.getIsMatched()) {
 			logger.info("Mentee time slot already matched");
 			return true;
+		}
+		/**
+		 * for each week the match should not be with same mentor
+		 */
+		for(Matches matches : newMatches) {
+			if (matches.getMatchesId().getEmail_mentee().equalsIgnoreCase(menteeAva.getAvailabilitiesId().getUserName())
+					&& matches.getMatchesId().getEmail_mentor()
+							.equalsIgnoreCase(mentorAva.getAvailabilitiesId().getUserName())) {
+				return true;
+			}
 		}
 		/**
 		 * for checking that there are only 2 matches per mentee per cycle
