@@ -5,11 +5,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +49,12 @@ public class RegisterAvailabilities {
 		if (diff < 45) {
 			throw new RuntimeException("Slots can be booked with 45 minutes minimum time difference!");
 		}
-		availabilitiesId.setFrom(availabilitys.getStartDate());
-		availabilitiesId.setTo(availabilitys.getEndDate());
+		Date startDateRounded = DateUtils.truncate(availabilitys.getStartDate(), Calendar.SECOND);
+		availabilitiesId.setFrom(startDateRounded);
+		logger.info("start time rounded : {}", String.valueOf(startDateRounded));
+		Date endDateRounded = DateUtils.truncate(availabilitys.getEndDate(), Calendar.SECOND);
+		logger.info("end time rounded : {}", String.valueOf(startDateRounded));
+		availabilitiesId.setTo(endDateRounded);
 		Availabilities availabilities = new Availabilities();
 		availabilities.setAvailabilitiesId(availabilitiesId);
 		availabilities.setIsMentor(availabilitys.getIsMentor());

@@ -160,10 +160,12 @@ public class SchedularService {
 					if (availabilities.getAvailabilitiesId().getUserName()
 							.equalsIgnoreCase(mentee.getAvailabilitiesId().getUserName())) {
 						isPrresentInList = true;
+						break;
 					}
 
 				}
 				if (!isPrresentInList) {
+					logger.info("adding mentee : {} to list ", mentee.getAvailabilitiesId().getUserName());
 					UniqueMentee.add(mentee);
 				}
 
