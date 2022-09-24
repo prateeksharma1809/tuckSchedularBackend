@@ -178,13 +178,15 @@ public class SchedularService {
 		for (Matches matches : newMatches) {
 			Credentials mentorCred = credentialsRepository.getById(matches.getMatchesId().getEmail_mentor());
 			Credentials menteeCred = credentialsRepository.getById(matches.getMatchesId().getEmail_mentee());
-
 			String body = "Hi " + mentorCred.getName() + ",\n You are matched with : " + menteeCred.getName()
 					+ ", Email : " + matches.getMatchesId().getEmail_mentee() + " \nfor the time slot  : "
 					+ simpleDateFormat.format(matches.getMatchesId().getFrom()) + " to : "
 					+ simpleDateFormat.format(matches.getMatchesId().getTo());
 			if (!matches.getCases().isEmpty()) {
-				body += " the mentee would prefer the case type : " + matches.getCases();
+				String[] cases = matches.getCases().split("??");
+				if(cases.length>0) {
+					body += " the mentee would prefer the case type : " + cases[0];
+				}
 			}
 			logger.info("mentor body : {}", body);
 			sendMailService.sendMail(matches.getMatchesId().getEmail_mentor(), "You were matched with a mentee!", body);
@@ -192,8 +194,12 @@ public class SchedularService {
 					+ matches.getMatchesId().getEmail_mentor() + " \nfor the time slot : "
 					+ simpleDateFormat.format(matches.getMatchesId().getFrom()) + " to: "
 					+ simpleDateFormat.format(matches.getMatchesId().getTo());
-			if (!matches.getCases().isEmpty())
-				body += " the available case type is : " + matches.getCases();
+			if (!matches.getCases().isEmpty()) {
+				String[] cases = matches.getCases().split("??");
+				if(cases.length>1) {
+					body += " the available case type is : " + cases[1];
+				}
+			}
 			if (null != mentorCred.getInterFirm() && !mentorCred.getInterFirm().isEmpty())
 				body += "\n " + mentorCred.getName() + " has done internship at :\n" + mentorCred.getInterFirm();
 			if (null != mentorCred.getFullTmOffer() && !mentorCred.getFullTmOffer().isEmpty())
@@ -210,18 +216,12 @@ public class SchedularService {
 
 	private String checkCasesMatched(Availabilities menteeAva, Availabilities mentorAva) {
 		String match = "";
-		if (menteeAva.getCases() != null && !"".equals(menteeAva.getCases()) && mentorAva.getCases() != null
-				&& !"".equals(mentorAva.getCases())) {
-			String[] menteeCases = menteeAva.getCases().split(";");
-			String[] mentorCases = mentorAva.getCases().split(";");
-			for (String mentorCase : mentorCases) {
-				for (String menteeCase : menteeCases) {
-					if (mentorCase.equals(menteeCase)) {
-						match += mentorCase;
-					}
-				}
-
-			}
+		if (menteeAva.getCases() != null && !"".equals(menteeAva.getCases())) {
+			match = menteeAva.getCases();
+		}
+		match +="??";
+		if(mentorAva.getCases() != null && !"".equals(mentorAva.getCases())) {
+			match +=mentorAva.getCases();
 		}
 		return match;
 	}
@@ -455,7 +455,6 @@ public class SchedularService {
 			}
 		}
 		return list;
-
 	}
 
 	private void sendMails(List<String[]> mentors, List<String[]> cred, List<String[]> matches)
@@ -507,7 +506,8 @@ public class SchedularService {
 		}
 
 	}
-
+	
+	@Deprecated
 	private String[] getCred(List<String[]> cred, String name) {
 		for (String[] strings : cred) {
 			if (name.equals(strings[0])) {
@@ -518,6 +518,7 @@ public class SchedularService {
 	}
 
 	// reset cred file with 0 in match column add a master match file
+	@Deprecated
 	private void updateMenteeAndMentorFiles(List<String[]> mentors, List<String[]> mentees, List<String[]> cred,
 			List<String[]> masterMatchs) throws IOException {
 		// change the logic here to erase the files
