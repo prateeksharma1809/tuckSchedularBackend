@@ -115,7 +115,7 @@ public class SchedularService {
 					String body = "Hi Mentee, \n Your available time slots do not coincide with any available mentor slots,"
 							+ "\n Don't worry, there are additional slots available as below."
 							+ "\n Please reach out to the mentors if any of these work for you"
-							+ "\n-----------------------------------------------------------------";
+							+ "\n------------------------------------------------------------------------------------------\n";
 					for (Availabilities mentorAva : availableMentors) {
 						Credentials mentorCred = credentialsRepository
 								.getById(mentorAva.getAvailabilitiesId().getUserName());
@@ -123,7 +123,7 @@ public class SchedularService {
 								+ mentorCred.getName() + "\n Available from : "
 								+ simpleDateFormat.format(mentorAva.getAvailabilitiesId().getFrom()) + ", till: "
 								+ simpleDateFormat.format(mentorAva.getAvailabilitiesId().getTo())
-								+ "/n-----------------------------------------------------------------";
+								+ "/n------------------------------------------------------------------------------------------\n";
 					}
 					logger.info("body : {}", body);
 					sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(),
