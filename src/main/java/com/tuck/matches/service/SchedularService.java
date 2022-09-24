@@ -50,6 +50,8 @@ public class SchedularService {
 
 	@Autowired
 	private SendMailService sendMailService;
+	
+	private String delimiter = "::";
 
 	public void schedular() {
 		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
@@ -183,7 +185,7 @@ public class SchedularService {
 					+ simpleDateFormat.format(matches.getMatchesId().getFrom()) + " to : "
 					+ simpleDateFormat.format(matches.getMatchesId().getTo());
 			if (!matches.getCases().isEmpty()) {
-				String[] cases = matches.getCases().split("??");
+				String[] cases = matches.getCases().split(delimiter);
 				if(cases.length>0) {
 					body += " the mentee would prefer the case type : " + cases[0];
 				}
@@ -195,7 +197,7 @@ public class SchedularService {
 					+ simpleDateFormat.format(matches.getMatchesId().getFrom()) + " to: "
 					+ simpleDateFormat.format(matches.getMatchesId().getTo());
 			if (!matches.getCases().isEmpty()) {
-				String[] cases = matches.getCases().split("??");
+				String[] cases = matches.getCases().split(delimiter);
 				if(cases.length>1) {
 					body += " the available case type is : " + cases[1];
 				}
@@ -219,7 +221,7 @@ public class SchedularService {
 		if (menteeAva.getCases() != null && !"".equals(menteeAva.getCases())) {
 			match = menteeAva.getCases();
 		}
-		match +="??";
+		match +=delimiter;
 		if(mentorAva.getCases() != null && !"".equals(mentorAva.getCases())) {
 			match +=mentorAva.getCases();
 		}
