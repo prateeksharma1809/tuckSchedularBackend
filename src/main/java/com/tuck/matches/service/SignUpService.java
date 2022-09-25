@@ -39,8 +39,8 @@ public class SignUpService {
 	}
 
 	private void sendMail(UserDetails user) {
-		String body = "You have been registerd with consulting club casing tool!\n \nIf you find this mail in SPAM folder please mark it as NOT SPAM to receive any further communications!";
-		sendMailService.sendMail(user.getUserName(), "Congratulations!!", body);
+		String body = "You have been registered with consulting club casing tool!\n \nIf you find this mail in SPAM folder please mark it as NOT SPAM to receive any further communications!";
+		sendMailService.sendMail(user.getUserName(), "Let’s start casing!", body);
 		
 	}
 
