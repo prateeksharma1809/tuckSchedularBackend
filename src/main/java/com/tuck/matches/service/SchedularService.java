@@ -102,13 +102,25 @@ public class SchedularService {
 
 	private void sendMailToUnmatchedMentees(List<Availabilities> menteeAvailabilities,
 			List<Availabilities> mentorAvailabilities, List<Matches> newMatches) {
+		
+		List<Availabilities> uniqueMentees = createUniqueMenteeList(menteeAvailabilities, newMatches);
+		for (Availabilities mentee : uniqueMentees) {
+			if (null == mentee.getIsMatched() || !mentee.getIsMatched()) {
+				String body = "Hi Mentee, \nYour available time slots do not coincide with any available mentor slots,"
+						+ "\nPlease try again next week!";
+				logger.info("body : {}", body);
+				sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(),
+						"Sorry, we were not able to find you a case slot", body);
+			}
+		}
+		//logic to send mail with available mentors -- uncomment below
+		/*
 		List<Availabilities> availableMentors = new ArrayList<>();
 		for (Availabilities mentor : mentorAvailabilities) {
 			if (mentor.getIsMatched() == null || !mentor.getIsMatched()) {
 				availableMentors.add(mentor);
 			}
 		}
-		List<Availabilities> uniqueMentees = createUniqueMenteeList(menteeAvailabilities, newMatches);
 		if (!availableMentors.isEmpty()) {
 			for (Availabilities mentee : uniqueMentees) {
 				if (null == mentee.getIsMatched() || !mentee.getIsMatched()) {
@@ -140,7 +152,7 @@ public class SchedularService {
 							"Sorry, we were not able to find you a case slot", body);
 				}
 			}
-		}
+		}*/
 
 	}
 
