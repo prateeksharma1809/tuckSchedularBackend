@@ -198,7 +198,7 @@ public class SchedularService {
 					+ simpleDateFormat.format(matches.getMatchesId().getTo());
 			if (!matches.getCases().isEmpty()) {
 				String[] cases = matches.getCases().split(delimiter);
-				if(cases.length>0) {
+				if(cases.length>0 && !cases[0].isEmpty()) {
 					body += "\nThe mentee would prefer the case type : " + cases[0];
 				}
 			}
@@ -210,7 +210,7 @@ public class SchedularService {
 					+ simpleDateFormat.format(matches.getMatchesId().getTo());
 			if (!matches.getCases().isEmpty()) {
 				String[] cases = matches.getCases().split(delimiter);
-				if(cases.length>1) {
+				if(cases.length>1 && !cases[1].isEmpty()) {
 					body += "\nCase type : " + cases[1];
 				}
 			}
