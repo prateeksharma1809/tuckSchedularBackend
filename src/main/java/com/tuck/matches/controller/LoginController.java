@@ -29,7 +29,6 @@ import com.tuck.matches.service.ForgotPasswordService;
 import com.tuck.matches.service.GetUserDetailsService;
 import com.tuck.matches.service.RegisterAvailabilities;
 import com.tuck.matches.service.SchedularService;
-import com.tuck.matches.service.SignUpService;
 
 @RestController
 public class LoginController {
@@ -128,16 +127,6 @@ public class LoginController {
 			
 	}
 	
-	@Deprecated
-	@CrossOrigin(origins = Constants.ORIGIN_URL)
-	@PostMapping("/sign-up-old")
-	public String signUp(@RequestBody UserDetails userdetails ) throws IOException, CsvException {
-		logger.info(userdetails.toString());
-		SignUpService s = new SignUpService();
-		s.signUp(userdetails);
-		return "Success";
-			
-	}
 	
 	
 	@Deprecated

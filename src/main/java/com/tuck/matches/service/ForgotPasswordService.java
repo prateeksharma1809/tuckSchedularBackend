@@ -56,7 +56,7 @@ public class ForgotPasswordService {
 		Optional<Credentials> record = credentialsRepository.findById(reset.getUserName());
 		if(record.isPresent()){
 			Credentials cred = record.get();
-			cred.setPassword(reset.getPassword());
+			cred.setPassword(EncodePasswordService.encode(reset.getPassword()));
 			credentialsRepository.save(cred);
 		}
 	}

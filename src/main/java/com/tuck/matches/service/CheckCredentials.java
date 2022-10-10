@@ -35,8 +35,7 @@ public class CheckCredentials {
 		Optional<Credentials> record = credentialsRepository.findById(loginForm.getUserName());
 		if(record.isPresent()) {
 			Credentials cred = record.get();
-//			logger.info("Should be removed : {}", cred);
-			if(cred.getPassword().equals(loginForm.getPassword())) {
+			if(DecodePasswordService.decode(cred.getPassword()).equals(loginForm.getPassword())) {
 				loginResponse.setIsAdmin(false);
 				loginResponse.setOpenPage(true);
 			}
@@ -53,6 +52,7 @@ public class CheckCredentials {
 		}
 	}
 
+	@Deprecated
 	public LoginResponse check(LoginForm loginForm) throws IOException, CsvException {
 		
 		LoginResponse response = new LoginResponse();
@@ -74,6 +74,7 @@ public class CheckCredentials {
 		}
 		return response;
 	}
+	@Deprecated
 	public boolean check(LoginForm loginForm, Boolean res) throws IOException, CsvException {
 		
 

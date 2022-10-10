@@ -22,7 +22,7 @@ public class EditProfileService {
 	
 	private void updateProfileinDB(UserDetails user) {
 		Credentials cred = credentialsRepository.getById(user.getUserName());
-		cred.setPassword(user.getPassword());
+		cred.setPassword(EncodePasswordService.encode(user.getPassword()));
 		cred.setInterFirm(user.getInterFirm());
 		cred.setFullTmOffer(user.getFullTmOffer());
 		cred.setCaseName(user.getCaseName());

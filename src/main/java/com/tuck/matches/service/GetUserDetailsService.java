@@ -39,7 +39,7 @@ public class GetUserDetailsService {
 
 	public UserDetailsWithAvalabilites getUserDetailsFromDB(String username, String password, boolean b) {
 		Credentials record = credentialsRepository.getById(username);
-		if(password.equals(record.getPassword())) {
+		if(password.equals(DecodePasswordService.decode(record.getPassword()))) {
 			return populateUserDatils(record);
 		}
 		return null;
@@ -50,7 +50,7 @@ public class GetUserDetailsService {
 		logger.info("record :{}", record);
 		UserDetailsWithAvalabilites userDetailsWithAvalabilites = new UserDetailsWithAvalabilites();
 		userDetailsWithAvalabilites.setUserName(record.getUserName());
-		userDetailsWithAvalabilites.setPassword(record.getPassword());
+		userDetailsWithAvalabilites.setPassword(DecodePasswordService.decode(record.getPassword()));
 		userDetailsWithAvalabilites.setName(record.getName());
 		userDetailsWithAvalabilites.setIsMentor(record.getIsMentor());
 		userDetailsWithAvalabilites.setInterFirm(record.getInterFirm());
@@ -125,7 +125,7 @@ public class GetUserDetailsService {
 		return ava;
 	}
 	
-
+	@Deprecated
 	private void populateAvalabilities(String[] strings, UserDetailsWithAvalabilites ava) throws ParseException {
 		Availabilitys availability = new Availabilitys();
 		formatter.setTimeZone(TimeZone.getTimeZone("America/New_York"));
