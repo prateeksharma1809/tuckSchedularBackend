@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvException;
+import com.tuck.matches.beans.Constants;
 import com.tuck.matches.entities.Availabilities;
 import com.tuck.matches.entities.Credentials;
 import com.tuck.matches.entities.Matches;
@@ -114,13 +115,32 @@ public class SchedularService {
 			}
 		}
 		//logic to send mail with available mentors -- uncomment below
-		/*
+		
 		List<Availabilities> availableMentors = new ArrayList<>();
 		for (Availabilities mentor : mentorAvailabilities) {
 			if (mentor.getIsMatched() == null || !mentor.getIsMatched()) {
 				availableMentors.add(mentor);
 			}
 		}
+		if (!availableMentors.isEmpty()) {
+			String body = "Hi, Below are the available time slots of mentors";
+			for (Availabilities mentorAva : availableMentors) {
+				Credentials mentorCred = credentialsRepository
+						.getById(mentorAva.getAvailabilitiesId().getUserName());
+				body += "\nEmail: " + mentorAva.getAvailabilitiesId().getUserName() + "\t Name: "
+						+ mentorCred.getName() + "\nAvailable from : "
+						+ simpleDateFormat.format(mentorAva.getAvailabilitiesId().getFrom()) + ", till: "
+						+ simpleDateFormat.format(mentorAva.getAvailabilitiesId().getTo())
+						+ "\n------------------------------------------------------------------------------------------\n";
+			}
+			logger.info("body : {}", body);
+			sendMailService.sendMail(Constants.EMAIL_ID,"Available Time slots of mentors", body);
+		}else {
+			sendMailService.sendMail(Constants.EMAIL_ID,
+					"Sorry, no slots were available for any mentor", "");
+		}
+		/*
+		 * logic to send to mentees 
 		if (!availableMentors.isEmpty()) {
 			for (Availabilities mentee : uniqueMentees) {
 				if (null == mentee.getIsMatched() || !mentee.getIsMatched()) {
@@ -247,7 +267,7 @@ public class SchedularService {
 			return true;
 		}
 		if (null != mentorAva.getIsMatched() && mentorAva.getIsMatched()) {
-			logger.info("Mentee time slot already matched");
+			logger.info("Mentor time slot already matched");
 			return true;
 		}
 		/**
