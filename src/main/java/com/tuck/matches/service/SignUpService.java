@@ -60,7 +60,7 @@ public class SignUpService {
 			credentials.setFullTmOffer(user.getFullTmOffer());
 			credentials.setCaseName(user.getCaseName());
 			credentials.setOfficeLocation(user.getOfficeLoc());
-			credentials.setNumberOfCases(10);
+			credentials.setNumberOfCases(5);
 		}
 		return credentials;
 	}
