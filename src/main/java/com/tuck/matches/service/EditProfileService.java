@@ -27,6 +27,7 @@ public class EditProfileService {
 		cred.setFullTmOffer(user.getFullTmOffer());
 		cred.setCaseName(user.getCaseName());
 		cred.setOfficeLocation(user.getOfficeLoc());
+		cred.setNumberOfCases(user.getNumberOfCases());
 		credentialsRepository.save(cred);
 	}	
 }

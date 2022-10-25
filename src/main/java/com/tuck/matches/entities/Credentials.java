@@ -34,6 +34,15 @@ public class Credentials {
 	@Column(name = "OFFICE_LOCATION")
 	private String officeLocation;
 	
+	@Column(name = "NUMBER_OF_CASES")
+	private Integer numberOfCases;
+	
+	public Integer getNumberOfCases() {
+		return numberOfCases;
+	}
+	public void setNumberOfCases(Integer numberOfCases) {
+		this.numberOfCases = numberOfCases;
+	}
 	public String getName() {
 		return name;
 	}
@@ -82,25 +91,9 @@ public class Credentials {
 	
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Credentials [userName=");
-		builder.append(userName);
-		builder.append(", password=");
-		builder.append(password);
-		builder.append(", name=");
-		builder.append(name);
-		builder.append(", interFirm=");
-		builder.append(interFirm);
-		builder.append(", fullTmOffer=");
-		builder.append(fullTmOffer);
-		builder.append(", isMentor=");
-		builder.append(isMentor);
-		builder.append(", caseName=");
-		builder.append(caseName);
-		builder.append(", officeLocation=");
-		builder.append(officeLocation);
-		builder.append("]");
-		return builder.toString();
+		return "Credentials [userName=" + userName + ", password=" + password + ", name=" + name + ", interFirm="
+				+ interFirm + ", fullTmOffer=" + fullTmOffer + ", isMentor=" + isMentor + ", caseName=" + caseName
+				+ ", officeLocation=" + officeLocation + ", numberOfCases=" + numberOfCases + "]";
 	}
 	public String getOfficeLocation() {
 		return officeLocation;

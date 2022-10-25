@@ -70,8 +70,12 @@ public class SchedularService {
 			Collections.shuffle(menteeAvailabilities);
 			for (int iteraion = 1; iteraion <= 2; iteraion++) {
 				for (Availabilities mentorAva : mentorAvailabilities) {
-					if (null != mentorAva.getIsMatched() && !mentorAva.getIsMatched()
-							&& mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 1) <= 5) {
+					Credentials mentorCred = credentialsRepository.getById(mentorAva.getAvailabilitiesId().getUserName());
+					if(mentorCred.getNumberOfCases()==null || mentorCred.getNumberOfCases()==0) {
+						mentorCred.setNumberOfCases(10);
+					}
+					if (mentorCred!=null && null != mentorAva.getIsMatched() && !mentorAva.getIsMatched()
+							&& mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 1) <= mentorCred.getNumberOfCases()) {
 						checkMenteeAvailabilities(menteeAvailabilities, matchesRecord, newMatches, mentorMatchCount,
 								menteeMatchCount, iteraion, mentorAva);
 					}

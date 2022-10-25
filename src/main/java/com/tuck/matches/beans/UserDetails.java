@@ -11,6 +11,7 @@ public class UserDetails {
 	private String numberOfMatches;
 	private String caseName;
 	private String officeLoc;
+	private int numberOfCases;
 	
 
 	public String getNumberOfMatches() {
@@ -59,27 +60,10 @@ public class UserDetails {
 	
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("UserDetails [userName=");
-		builder.append(userName);
-		builder.append(", password=");
-		builder.append(password);
-		builder.append(", name=");
-		builder.append(name);
-		builder.append(", interFirm=");
-		builder.append(interFirm);
-		builder.append(", fullTmOffer=");
-		builder.append(fullTmOffer);
-		builder.append(", isMentor=");
-		builder.append(isMentor);
-		builder.append(", numberOfMatches=");
-		builder.append(numberOfMatches);
-		builder.append(", caseName=");
-		builder.append(caseName);
-		builder.append(", officeLoc=");
-		builder.append(officeLoc);
-		builder.append("]");
-		return builder.toString();
+		return "UserDetails [userName=" + userName + ", password=" + password + ", name=" + name + ", interFirm="
+				+ interFirm + ", fullTmOffer=" + fullTmOffer + ", isMentor=" + isMentor + ", numberOfMatches="
+				+ numberOfMatches + ", caseName=" + caseName + ", officeLoc=" + officeLoc + ", numberOfCases="
+				+ numberOfCases + "]";
 	}
 	public String getCaseName() {
 		return caseName;
@@ -92,6 +76,12 @@ public class UserDetails {
 	}
 	public void setOfficeLoc(String officeLoc) {
 		this.officeLoc = officeLoc;
+	}
+	public int getNumberOfCases() {
+		return numberOfCases;
+	}
+	public void setNumberOfCases(int numberOfCases) {
+		this.numberOfCases = numberOfCases;
 	}
 	
 	
