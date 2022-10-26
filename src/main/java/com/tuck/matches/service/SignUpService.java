@@ -1,5 +1,9 @@
 package com.tuck.matches.service;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
 import com.tuck.matches.beans.UserDetails;
 import com.tuck.matches.entities.Credentials;
 import com.tuck.matches.repository.CredentialsRepository;
@@ -22,11 +28,29 @@ public class SignUpService {
 	@Autowired
 	private SendMailService sendMailService;
 	
-	public void signUpDB(UserDetails user) {
+	public void signUpDB(UserDetails user) throws FileNotFoundException, IOException, CsvException {
 		this.validate(user);
 		this.checkUserExistsInDB(user.getUserName());
+		this.validateOtp(user);
 		this.createUserInDB(user);
 		this.sendMail(user);
+	}
+
+	private boolean validateOtp(UserDetails user) throws FileNotFoundException, IOException, CsvException {
+			try (CSVReader reader = new CSVReader(new FileReader("./src/main/resources/OTP.csv"))) {
+				List<String[]> r = reader.readAll();
+				for(int i = r.size()-1;i>=0;i--) {
+					String[] arr = r.get(i);
+					if(arr[0].equalsIgnoreCase(user.getUserName())) {
+						if(arr[1].equals(user.getOtp())) {
+							return true;
+						}
+						return false;
+						
+					}
+				}
+			}
+			return false;
 	}
 
 	private void sendMail(UserDetails user) {
@@ -55,6 +79,7 @@ public class SignUpService {
 		credentials.setPassword(EncodePasswordService.encode(user.getPassword()));
 		credentials.setName(user.getName());
 		credentials.setIsMentor(user.getIsMentor());
+		credentials.setNumberOfCases(0);
 		if(user.getIsMentor()) {
 			credentials.setInterFirm(user.getInterFirm());
 			credentials.setFullTmOffer(user.getFullTmOffer());

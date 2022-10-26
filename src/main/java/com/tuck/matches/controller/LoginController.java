@@ -105,6 +105,17 @@ public class LoginController {
 		return "Success";
 			
 	}
+	@CrossOrigin(origins = Constants.ORIGIN_URL)
+	@GetMapping("/generate-otp-sign-up/{username}")
+	public String generateOTPForSignup(@PathVariable String username ) throws IOException, CsvException {
+		logger.info(username);
+		if(null == username) {
+			throw new RuntimeException("User does not exist Kindly click on Sign up or try with correct credentials!");
+		}
+		forgotPasswordService.generateOtpSignUp(username);
+		return "Success";
+		
+	}
 	
 
 	@CrossOrigin(origins =Constants.ORIGIN_URL)

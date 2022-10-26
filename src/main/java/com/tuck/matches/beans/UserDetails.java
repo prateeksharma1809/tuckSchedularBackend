@@ -11,7 +11,8 @@ public class UserDetails {
 	private String numberOfMatches;
 	private String caseName;
 	private String officeLoc;
-	private int numberOfCases;
+	private Integer numberOfCases;
+	private String otp;
 	
 
 	public String getNumberOfMatches() {
@@ -77,11 +78,17 @@ public class UserDetails {
 	public void setOfficeLoc(String officeLoc) {
 		this.officeLoc = officeLoc;
 	}
-	public int getNumberOfCases() {
+	public Integer getNumberOfCases() {
 		return numberOfCases;
 	}
-	public void setNumberOfCases(int numberOfCases) {
+	public void setNumberOfCases(Integer numberOfCases) {
 		this.numberOfCases = numberOfCases;
+	}
+	public String getOtp() {
+		return otp;
+	}
+	public void setOtp(String otp) {
+		this.otp = otp;
 	}
 	
 	

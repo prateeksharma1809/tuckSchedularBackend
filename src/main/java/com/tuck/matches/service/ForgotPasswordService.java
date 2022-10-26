@@ -77,6 +77,11 @@ public class ForgotPasswordService {
 		}
 		return false;
 	}
+
+	public void generateOtpSignUp(String username) throws IOException {
+		sendMailService.sendMail(username);
+		
+	}
 	
 	
 	

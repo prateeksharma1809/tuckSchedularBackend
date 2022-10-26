@@ -129,7 +129,7 @@ public class SendMailService {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
 
             // Set Subject: header field
-            message.setSubject("Reset password");
+            message.setSubject("Reset password / Sign up");
 
             // Now set the actual message
             message.setText("OTP : "+otp);

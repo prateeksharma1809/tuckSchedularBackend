@@ -1,5 +1,6 @@
 package com.tuck.matches.controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -48,7 +49,7 @@ public class NewRestController {
 	
 	@CrossOrigin(origins = Constants.ORIGIN_URL)
 	@PostMapping("/sign-up")
-	public String signUp(@RequestBody UserDetails userdetails ) {
+	public String signUp(@RequestBody UserDetails userdetails ) throws FileNotFoundException, IOException, CsvException {
 		logger.info("sign up new :{} ", userdetails.toString());
 		signUpService.signUpDB(userdetails);
 		return "Success";
