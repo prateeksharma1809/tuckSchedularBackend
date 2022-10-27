@@ -45,6 +45,48 @@ public class GetUserDetailsService {
 		return null;
 	}
 	
+	public void deleteUser(String username) {
+		List<Availabilities> list = availabilitiesRepository.retrieveByEmail(username);
+		if(list != null && !list.isEmpty()) {
+			availabilitiesRepository.deleteAll(list);
+		}
+		credentialsRepository.deleteById(username);
+		
+	}
+	
+	public List<UserDetails> getAllUserDetailsFromDB() {
+		 List<Credentials> records = credentialsRepository.findAll();
+		if(null!=records && !records.isEmpty()) {
+			return populateAll(records);
+		}
+		return null;
+	}
+
+	private List<UserDetails> populateAll(List<Credentials> records) {
+		List<UserDetails> listuserDetails = new ArrayList<>();
+		for (Credentials credentials : records) {
+			listuserDetails.add(getUserDetails(credentials));
+		}
+		
+		return listuserDetails;
+		
+	}
+
+	private UserDetails getUserDetails(Credentials record) {
+		UserDetails ud = new UserDetails();
+		if(record!=null) {
+			ud.setUserName(record.getUserName());
+			ud.setName(record.getName());
+			ud.setIsMentor(record.getIsMentor());
+			ud.setNumberOfCases(getnumberofcases(record.getUserName()));
+		}
+		return ud;
+	}
+
+	private Integer getnumberofcases(String string) {
+		List<Availabilities> list = availabilitiesRepository.retrieveByEmail(string);
+		return list.size();
+	}
 
 	private UserDetailsWithAvalabilites populateUserDatils(Credentials record) {
 		logger.info("record :{}", record);

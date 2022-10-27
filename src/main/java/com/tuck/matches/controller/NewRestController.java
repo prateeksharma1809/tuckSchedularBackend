@@ -2,6 +2,7 @@ package com.tuck.matches.controller;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.opencsv.exceptions.CsvException;
 import com.tuck.matches.beans.Availabilitys;
 import com.tuck.matches.beans.Constants;
+import com.tuck.matches.beans.DeleteUserBean;
 import com.tuck.matches.beans.LoginForm;
 import com.tuck.matches.beans.LoginResponse;
 import com.tuck.matches.beans.UserDetails;
@@ -108,4 +110,28 @@ public class NewRestController {
 		editProfileService.editProfile(userdetails);
 		return "Success";
 	}
+	
+	@CrossOrigin(origins = Constants.ORIGIN_URL)
+	@GetMapping("/get-all-user-details")
+	public List<UserDetails> getAllUserDetails(@RequestHeader String username , @RequestHeader String password) {
+		logger.info("username:{}",username);
+		if(null == username || !"Admin".equals(username) || !"Admin11!".equals(password)) {
+			throw new RuntimeException("Not Authorize to access the data!");
+		}
+		return getUserDetailsService.getAllUserDetailsFromDB();
+			
+	}
+	
+	@CrossOrigin(origins = Constants.ORIGIN_URL)
+	@PostMapping("/delete-user")
+	public String deleteUser(@RequestBody DeleteUserBean usd) {
+		logger.info(usd.toString());
+		if("Admin".equals(usd.getUserName()) && "Admin11!".equals(usd.getPassword())) {
+			getUserDetailsService.deleteUser(usd.getUserToDelete());
+		}else {
+			throw new RuntimeException("Not authorized!");
+		}
+		return "Success";		
+	}
+	
 }

@@ -69,13 +69,17 @@ public class SchedularService {
 			Collections.shuffle(mentorAvailabilities);
 			Collections.shuffle(menteeAvailabilities);
 			for (int iteraion = 1; iteraion <= 2; iteraion++) {
+				logger.info("iteration no : {}", iteraion);
 				for (Availabilities mentorAva : mentorAvailabilities) {
+//					logger.info("mentor : {}", mentorAva);
 					Credentials mentorCred = credentialsRepository.getById(mentorAva.getAvailabilitiesId().getUserName());
 					if(mentorCred.getNumberOfCases()==null || mentorCred.getNumberOfCases()==0) {
-						mentorCred.setNumberOfCases(10);
+						logger.info("setting number of cases to 10 for : {}", mentorAva.getAvailabilitiesId().getUserName());
+						mentorCred.setNumberOfCases(5);
 					}
-					if (mentorCred!=null && null != mentorAva.getIsMatched() && !mentorAva.getIsMatched()
-							&& mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 1) <= mentorCred.getNumberOfCases()) {
+//					logger.info("mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 1) : {}", mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 1));
+					if (mentorCred!=null && null == mentorAva.getIsMatched()
+							&& mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 0) < mentorCred.getNumberOfCases()) {
 						checkMenteeAvailabilities(menteeAvailabilities, matchesRecord, newMatches, mentorMatchCount,
 								menteeMatchCount, iteraion, mentorAva);
 					}
@@ -96,13 +100,17 @@ public class SchedularService {
 			List<Matches> newMatches, Map<String, Integer> mentorMatchCount, Map<String, Integer> menteeMatchCount,
 			int iteraion, Availabilities mentorAva) {
 		for (Availabilities menteeAva : menteeAvailabilities) {
-			if (null != menteeAva.getIsMatched() && !menteeAva.getIsMatched()
+//			logger.info("menteeAva : {}", menteeAva);
+//			logger.info("menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0) : {}", menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0));
+			if (null == menteeAva.getIsMatched()
 					&& menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0) < iteraion) {
 				if (mentorAva.getAvailabilitiesId().getFrom().compareTo(menteeAva.getAvailabilitiesId().getFrom()) >= 0
 						&& mentorAva.getAvailabilitiesId().getTo()
 								.compareTo(menteeAva.getAvailabilitiesId().getTo()) <= 0
 						&& !checkAlreadyMatched2Times(menteeAva, mentorAva, matchesRecord, newMatches, iteraion,
 								menteeMatchCount)) {
+//					logger.info("mentor : {}", mentorAva);
+//					logger.info("menteeAva : {}", menteeAva);
 					MatchesId matchedId = new MatchesId();
 					matchedId.setEmail_mentee(menteeAva.getAvailabilitiesId().getUserName());
 					matchedId.setEmail_mentor(mentorAva.getAvailabilitiesId().getUserName());
@@ -120,7 +128,10 @@ public class SchedularService {
 							menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0) + 1);
 					mentorMatchCount.put(mentorAva.getAvailabilitiesId().getUserName(),
 							mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 0) + 1);
-
+					
+//					logger.info("mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 1) : {}", mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 1));
+//					logger.info("menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0) : {}", menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0));
+					
 					break;
 				}
 			}
