@@ -12,9 +12,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.DateUtils;
@@ -71,15 +73,16 @@ public class SchedularService {
 			for (int iteraion = 1; iteraion <= 2; iteraion++) {
 				logger.info("iteration no : {}", iteraion);
 				for (Availabilities mentorAva : mentorAvailabilities) {
-//					logger.info("mentor : {}", mentorAva);
-					Credentials mentorCred = credentialsRepository.getById(mentorAva.getAvailabilitiesId().getUserName());
-					if(mentorCred.getNumberOfCases()==null || mentorCred.getNumberOfCases()==0) {
-						logger.info("setting number of cases to 10 for : {}", mentorAva.getAvailabilitiesId().getUserName());
+					Credentials mentorCred = credentialsRepository
+							.getById(mentorAva.getAvailabilitiesId().getUserName());
+					if (mentorCred.getNumberOfCases() == null || mentorCred.getNumberOfCases() == 0) {
+						logger.info("setting number of cases to 10 for : {}",
+								mentorAva.getAvailabilitiesId().getUserName());
 						mentorCred.setNumberOfCases(5);
 					}
-//					logger.info("mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 1) : {}", mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 1));
-					if (mentorCred!=null && null == mentorAva.getIsMatched()
-							&& mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 0) < mentorCred.getNumberOfCases()) {
+					if (mentorCred != null && null == mentorAva.getIsMatched()
+							&& mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(),
+									0) < mentorCred.getNumberOfCases()) {
 						checkMenteeAvailabilities(menteeAvailabilities, matchesRecord, newMatches, mentorMatchCount,
 								menteeMatchCount, iteraion, mentorAva);
 					}
@@ -90,8 +93,8 @@ public class SchedularService {
 		if (!newMatches.isEmpty()) {
 			sendMailToMatched(newMatches);
 		}
-		sendMailToUnmatchedMentees(menteeAvailabilities, mentorAvailabilities, newMatches);
-		matchesJpaRepository.saveAll(matchesRecord);
+		sendMailToUnmatchedMentees(menteeAvailabilities, mentorAvailabilities, menteeMatchCount);
+		matchesJpaRepository.saveAllAndFlush(matchesRecord);
 		availabilitiesRepository.deleteAll();
 
 	}
@@ -100,8 +103,6 @@ public class SchedularService {
 			List<Matches> newMatches, Map<String, Integer> mentorMatchCount, Map<String, Integer> menteeMatchCount,
 			int iteraion, Availabilities mentorAva) {
 		for (Availabilities menteeAva : menteeAvailabilities) {
-//			logger.info("menteeAva : {}", menteeAva);
-//			logger.info("menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0) : {}", menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0));
 			if (null == menteeAva.getIsMatched()
 					&& menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0) < iteraion) {
 				if (mentorAva.getAvailabilitiesId().getFrom().compareTo(menteeAva.getAvailabilitiesId().getFrom()) >= 0
@@ -109,8 +110,6 @@ public class SchedularService {
 								.compareTo(menteeAva.getAvailabilitiesId().getTo()) <= 0
 						&& !checkAlreadyMatched2Times(menteeAva, mentorAva, matchesRecord, newMatches, iteraion,
 								menteeMatchCount)) {
-//					logger.info("mentor : {}", mentorAva);
-//					logger.info("menteeAva : {}", menteeAva);
 					MatchesId matchedId = new MatchesId();
 					matchedId.setEmail_mentee(menteeAva.getAvailabilitiesId().getUserName());
 					matchedId.setEmail_mentor(mentorAva.getAvailabilitiesId().getUserName());
@@ -128,10 +127,6 @@ public class SchedularService {
 							menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0) + 1);
 					mentorMatchCount.put(mentorAva.getAvailabilitiesId().getUserName(),
 							mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 0) + 1);
-					
-//					logger.info("mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 1) : {}", mentorMatchCount.getOrDefault(mentorAva.getAvailabilitiesId().getUserName(), 1));
-//					logger.info("menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0) : {}", menteeMatchCount.getOrDefault(menteeAva.getAvailabilitiesId().getUserName(), 0));
-					
 					break;
 				}
 			}
@@ -139,17 +134,14 @@ public class SchedularService {
 	}
 
 	private void sendMailToUnmatchedMentees(List<Availabilities> menteeAvailabilities,
-			List<Availabilities> mentorAvailabilities, List<Matches> newMatches) {
+			List<Availabilities> mentorAvailabilities, Map<String, Integer> menteeMatchCount) {
 
-		List<Availabilities> uniqueMentees = createUniqueMenteeList(menteeAvailabilities, newMatches);
-		for (Availabilities mentee : uniqueMentees) {
-			if (null == mentee.getIsMatched() || !mentee.getIsMatched()) {
-				String body = "Hi Mentee, \nYour available time slots do not coincide with any available mentor slots,"
-						+ "\nPlease try again next week!";
-				logger.info("body : {}", body);
-				sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(),
-						"Sorry, we were not able to find you a case slot", body);
-			}
+		Set<String> uniqueMentees = createUniqueMenteeList(menteeAvailabilities, menteeMatchCount);
+		for (String mentee : uniqueMentees) {
+			String body = "Hi Mentee, \nYour available time slots do not coincide with any available mentor slots,"
+					+ "\nPlease try again next week!";
+			logger.info("body : {}", body);
+			sendMailService.sendMail(mentee, "Sorry, we were not able to find you a case slot", body);
 		}
 		// logic to send mail with available mentors -- uncomment below
 
@@ -173,63 +165,16 @@ public class SchedularService {
 		} else {
 			sendMailService.sendMail(Constants.EMAIL_ID, "Sorry, no slots were available for any mentor", "");
 		}
-		/*
-		 * logic to send to mentees if (!availableMentors.isEmpty()) { for
-		 * (Availabilities mentee : uniqueMentees) { if (null == mentee.getIsMatched()
-		 * || !mentee.getIsMatched()) { String body =
-		 * "Hi Mentee, \nYour available time slots do not coincide with any available mentor slots,"
-		 * + "\nDon't worry, there are additional slots available as below." +
-		 * "\nPlease reach out to the mentors if any of these work for you" +
-		 * "\n------------------------------------------------------------------------------------------\n";
-		 * for (Availabilities mentorAva : availableMentors) { Credentials mentorCred =
-		 * credentialsRepository
-		 * .getById(mentorAva.getAvailabilitiesId().getUserName()); body += "\nEmail: "
-		 * + mentorAva.getAvailabilitiesId().getUserName() + "\t Name: " +
-		 * mentorCred.getName() + "\nAvailable from : " +
-		 * simpleDateFormat.format(mentorAva.getAvailabilitiesId().getFrom()) +
-		 * ", till: " + simpleDateFormat.format(mentorAva.getAvailabilitiesId().getTo())
-		 * +
-		 * "\n------------------------------------------------------------------------------------------\n";
-		 * } logger.info("body : {}", body);
-		 * sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(),
-		 * "Sorry, we were not able to find you a case slot", body); } } } else { for
-		 * (Availabilities mentee : uniqueMentees) { if (null == mentee.getIsMatched()
-		 * || !mentee.getIsMatched()) { String body =
-		 * "Hi Mentee, \nYour available time slots do not coincide with any available mentor slots,"
-		 * + "\nPlease try again next week!"; logger.info("body : {}", body);
-		 * sendMailService.sendMail(mentee.getAvailabilitiesId().getUserName(),
-		 * "Sorry, we were not able to find you a case slot", body); } } }
-		 */
 
 	}
 
-	private List<Availabilities> createUniqueMenteeList(List<Availabilities> menteeAvailabilities,
-			List<Matches> newMatches) {
-		List<Availabilities> UniqueMentee = new ArrayList<>();
+	private Set<String> createUniqueMenteeList(List<Availabilities> menteeAvailabilities,
+			Map<String, Integer> menteeMatchCount) {
+		Set<String> UniqueMentee = new HashSet<>();
 		for (Availabilities mentee : menteeAvailabilities) {
-			boolean found = false;
-			for (Matches matches : newMatches) {
-				if (matches.getMatchesId().getEmail_mentee()
-						.equalsIgnoreCase(mentee.getAvailabilitiesId().getUserName())) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				boolean isPrresentInList = false;
-				for (Availabilities availabilities : UniqueMentee) {
-					if (availabilities.getAvailabilitiesId().getUserName()
-							.equalsIgnoreCase(mentee.getAvailabilitiesId().getUserName())) {
-						isPrresentInList = true;
-						break;
-					}
-
-				}
-				if (!isPrresentInList) {
-					logger.info("adding mentee : {} to list ", mentee.getAvailabilitiesId().getUserName());
-					UniqueMentee.add(mentee);
-				}
-
+			if (!menteeMatchCount.containsKey(mentee.getAvailabilitiesId().getUserName())) {
+				if (mentee.getIsMatched() == null || !mentee.getIsMatched())
+					UniqueMentee.add(mentee.getAvailabilitiesId().getUserName());
 			}
 		}
 		return UniqueMentee;
@@ -272,7 +217,6 @@ public class SchedularService {
 			logger.info("mentee body : {}", body);
 			sendMailService.sendMail(matches.getMatchesId().getEmail_mentee(), "You were matched with a mentor!", body);
 		}
-
 	}
 
 	private String checkCasesMatched(Availabilities menteeAva, Availabilities mentorAva) {

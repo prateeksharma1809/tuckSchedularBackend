@@ -9,17 +9,18 @@ import javax.persistence.Table;
 @Table(name = "availabilities")
 public class Availabilities {
 
-	@EmbeddedId private AvailabilitiesId availabilitiesId;
-	
+	@EmbeddedId
+	private AvailabilitiesId availabilitiesId;
+
 	@Column(name = "IS_MENTOR")
 	private Boolean isMentor;
 
 	@Column(name = "CASES")
 	private String cases;
 
-	@Column(name="IS_MATCHED")
+	@Column(name = "IS_MATCHED")
 	private Boolean isMatched;
-	
+
 	public Boolean getIsMentor() {
 		return isMentor;
 	}
@@ -66,5 +67,5 @@ public class Availabilities {
 	public void setIsMatched(Boolean isMatched) {
 		this.isMatched = isMatched;
 	}
-	
+
 }
