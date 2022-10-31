@@ -53,9 +53,6 @@ public class SchedularService {
 	@Autowired
 	private CredentialsRepository credentialsRepository;
 
-	@Autowired
-	private SendMailService sendMailService;
-
 	private String delimiter = "::";
 
 	public void schedular() {
@@ -135,7 +132,7 @@ public class SchedularService {
 
 	private void sendMailToUnmatchedMentees(List<Availabilities> menteeAvailabilities,
 			List<Availabilities> mentorAvailabilities, Map<String, Integer> menteeMatchCount) {
-
+		SendMailService sendMailService = new SendMailService();
 		Set<String> uniqueMentees = createUniqueMenteeList(menteeAvailabilities, menteeMatchCount);
 		for (String mentee : uniqueMentees) {
 			String body = "Hi Mentee, \nYour available time slots do not coincide with any available mentor slots,"
@@ -177,10 +174,12 @@ public class SchedularService {
 					UniqueMentee.add(mentee.getAvailabilitiesId().getUserName());
 			}
 		}
+		logger.info("unique mentee list : {}", UniqueMentee);
 		return UniqueMentee;
 	}
 
 	private void sendMailToMatched(List<Matches> newMatches) {
+		SendMailService sendMailService = new SendMailService();
 		for (Matches matches : newMatches) {
 			Credentials mentorCred = credentialsRepository.getById(matches.getMatchesId().getEmail_mentor());
 			Credentials menteeCred = credentialsRepository.getById(matches.getMatchesId().getEmail_mentee());
@@ -463,6 +462,7 @@ public class SchedularService {
 		return list;
 	}
 
+	@Deprecated
 	private void sendMails(List<String[]> mentors, List<String[]> cred, List<String[]> matches)
 			throws FileNotFoundException, IOException, CsvException {
 		SendMailService s = new SendMailService();
