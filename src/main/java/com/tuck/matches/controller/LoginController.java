@@ -2,6 +2,7 @@ package com.tuck.matches.controller;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ public class LoginController {
 	
 	@Autowired
 	private SchedularService schedularService;
+	
 	
 	@RequestMapping("/")  
 	public String hello()   
@@ -162,6 +164,20 @@ public class LoginController {
 		}
 		return "Success";	
 	}
+	
+	
+	@CrossOrigin(origins = Constants.ORIGIN_URL)
+	@GetMapping("/schedule-async/{username}")
+	public CompletableFuture<String> scheduleAsync(@PathVariable String username , @RequestHeader String password) {
+		logger.info("username {}, password:{}",username, password);
+		if("Admin".equals(username) && "Admin11!".equals(password)) {
+			return schedularService.schedularAsync();
+		}else {
+			throw new RuntimeException("Only admins allowed to perform this action!");
+		}
+			
+	}
+	
 	
 	
 	

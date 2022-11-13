@@ -23,7 +23,6 @@ public class BeanConfiguration {
 		return new SchedularService();
 	}
 	
-
 	
 	@Bean
 	@Scope("prototype")

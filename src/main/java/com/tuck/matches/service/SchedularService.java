@@ -12,17 +12,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -133,13 +133,13 @@ public class SchedularService {
 	private void sendMailToUnmatchedMentees(List<Availabilities> menteeAvailabilities,
 			List<Availabilities> mentorAvailabilities, Map<String, Integer> menteeMatchCount) {
 		SendMailService sendMailService = new SendMailService();
-		Set<String> uniqueMentees = createUniqueMenteeList(menteeAvailabilities, menteeMatchCount);
-		for (String mentee : uniqueMentees) {
-			String body = "Hi Mentee, \nYour available time slots do not coincide with any available mentor slots,"
-					+ "\nPlease try again next week!";
-			logger.info("body : {}", body);
-			sendMailService.sendMail(mentee, "Sorry, we were not able to find you a case slot", body);
-		}
+//		Set<String> uniqueMentees = createUniqueMenteeList(menteeAvailabilities, menteeMatchCount);
+//		for (String mentee : uniqueMentees) {
+//			String body = "Hi Mentee, \nYour available time slots do not coincide with any available mentor slots,"
+//					+ "\nPlease try again next week!";
+//			logger.info("body : {}", body);
+////			sendMailService.sendMail(mentee, "Sorry, we were not able to find you a case slot", body);
+//		}
 		// logic to send mail with available mentors -- uncomment below
 
 		List<Availabilities> availableMentors = new ArrayList<>();
@@ -165,18 +165,18 @@ public class SchedularService {
 
 	}
 
-	private Set<String> createUniqueMenteeList(List<Availabilities> menteeAvailabilities,
-			Map<String, Integer> menteeMatchCount) {
-		Set<String> UniqueMentee = new HashSet<>();
-		for (Availabilities mentee : menteeAvailabilities) {
-			if (!menteeMatchCount.containsKey(mentee.getAvailabilitiesId().getUserName())) {
-				if (mentee.getIsMatched() == null || !mentee.getIsMatched())
-					UniqueMentee.add(mentee.getAvailabilitiesId().getUserName());
-			}
-		}
-		logger.info("unique mentee list : {}", UniqueMentee);
-		return UniqueMentee;
-	}
+//	private Set<String> createUniqueMenteeList(List<Availabilities> menteeAvailabilities,
+//			Map<String, Integer> menteeMatchCount) {
+//		Set<String> UniqueMentee = new HashSet<>();
+//		for (Availabilities mentee : menteeAvailabilities) {
+//			if (!menteeMatchCount.containsKey(mentee.getAvailabilitiesId().getUserName())) {
+//				if (mentee.getIsMatched() == null || !mentee.getIsMatched())
+//					UniqueMentee.add(mentee.getAvailabilitiesId().getUserName());
+//			}
+//		}
+//		logger.info("unique mentee list : {}", UniqueMentee);
+//		return UniqueMentee;
+//	}
 
 	private void sendMailToMatched(List<Matches> newMatches) {
 		SendMailService sendMailService = new SendMailService();
@@ -562,6 +562,12 @@ public class SchedularService {
 			}
 		}
 		return "";
+	}
+	
+	@Async
+	public CompletableFuture<String> schedularAsync() {
+		this.schedular();
+		return CompletableFuture.completedFuture("Success");
 	}
 
 }

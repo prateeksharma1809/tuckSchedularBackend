@@ -23,34 +23,43 @@ import com.tuck.matches.beans.Constants;
 public class SendMailService {
 	Logger logger = LoggerFactory.getLogger(SendMailService.class);
 	
-	public void sendMail(String to, String subject, String body) {
-		String from = Constants.EMAIL_ID;
-		String password = Constants.PASSWORD;
-		// Assuming you are sending email from through gmails smtp
-        String host = "smtp.gmail.com";
+	Session session;
+	String from = Constants.EMAIL_ID;
+	String password = Constants.PASSWORD;
+	String host = "smtp.gmail.com";
+	MimeMessage message;
+	
+	public SendMailService(){
+	        // Get system properties
+	        Properties properties = System.getProperties();
 
-        // Get system properties
-        Properties properties = System.getProperties();
-
-        // Setup mail server
-        properties.put("mail.smtp.host", host);
-        properties.put("mail.smtp.port", "465");
-        properties.put("mail.smtp.ssl.enable", "true");
-        properties.put("mail.smtp.auth", "true");
-
+	        // Setup mail server
+	        properties.put("mail.smtp.host", host);
+	        properties.put("mail.smtp.port", "465");
+	        properties.put("mail.smtp.ssl.enable", "true");
+	        properties.put("mail.smtp.auth", "true");
         // Get the Session object.// and pass username and password
-        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+        this.session = Session.getInstance(properties, new javax.mail.Authenticator() {
 
             protected PasswordAuthentication getPasswordAuthentication() {
 
                 return new PasswordAuthentication(from, password);
             }
         });
+        message = new MimeMessage(session);
+	}
+	
+	public void sendMail(String to, String subject, String body) {
+		
+		// Assuming you are sending email from through gmails smtp
+       
+
+
         // Used to debug SMTP issues
-        session.setDebug(true);
+//        session.setDebug(true);
         try {
             // Create a default MimeMessage object.
-            MimeMessage message = new MimeMessage(session);
+            
 
             // Set From: header field of the header.
             message.setFrom(new InternetAddress(from));
@@ -87,40 +96,40 @@ public class SendMailService {
 	
 //	public void sendMail() {
 	public void sendMail(String to) throws IOException {
-		String from = Constants.EMAIL_ID;
-		String password = Constants.PASSWORD;
+//		String from = Constants.EMAIL_ID;
+//		String password = Constants.PASSWORD;
 		logger.info("from :{}, password :{}", from, password);
 		
         String otp = this.getRandomNumberString();
         logger.info(otp);
 
         // Assuming you are sending email from through gmails smtp
-        String host = "smtp.gmail.com";
-
-        // Get system properties
-        Properties properties = System.getProperties();
-
-        // Setup mail server
-        properties.put("mail.smtp.host", host);
-        properties.put("mail.smtp.port", "465");
-        properties.put("mail.smtp.ssl.enable", "true");
-        properties.put("mail.smtp.auth", "true");
+//        String host = "smtp.gmail.com";
+//
+//        // Get system properties
+//        Properties properties = System.getProperties();
+//
+//        // Setup mail server
+//        properties.put("mail.smtp.host", host);
+//        properties.put("mail.smtp.port", "465");
+//        properties.put("mail.smtp.ssl.enable", "true");
+//        properties.put("mail.smtp.auth", "true");
 
         // Get the Session object.// and pass username and password
-        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
-
-            protected PasswordAuthentication getPasswordAuthentication() {
-
-                return new PasswordAuthentication(from, password);
-
-            }
-
-        });
+//        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+//
+//            protected PasswordAuthentication getPasswordAuthentication() {
+//
+//                return new PasswordAuthentication(from, password);
+//
+//            }
+//
+//        });
         // Used to debug SMTP issues
-        session.setDebug(true);
+//        session.setDebug(true);
         try {
             // Create a default MimeMessage object.
-            MimeMessage message = new MimeMessage(session);
+//            MimeMessage message = new MimeMessage(session);
 
             // Set From: header field of the header.
             message.setFrom(new InternetAddress(from));
