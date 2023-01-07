@@ -65,6 +65,7 @@ public class SendMailService {
             message.setFrom(new InternetAddress(from));
 
             // Set To: header field of the header.
+            
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
 
             // Set Subject: header field
@@ -78,6 +79,7 @@ public class SendMailService {
             Transport.send(message);
             
             logger.info("Sent message successfully....");
+            message.setRecipient(Message.RecipientType.TO, null);
         } catch (MessagingException mex) {
             mex.printStackTrace();
         }

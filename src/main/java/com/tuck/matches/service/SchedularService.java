@@ -179,7 +179,7 @@ public class SchedularService {
 //	}
 
 	private void sendMailToMatched(List<Matches> newMatches) {
-		SendMailService sendMailService = new SendMailService();
+//		SendMailService sendMailService = new SendMailService();
 		for (Matches matches : newMatches) {
 			Credentials mentorCred = credentialsRepository.getById(matches.getMatchesId().getEmail_mentor());
 			Credentials menteeCred = credentialsRepository.getById(matches.getMatchesId().getEmail_mentee());
@@ -194,7 +194,7 @@ public class SchedularService {
 				}
 			}
 			logger.info("mentor body : {}", body);
-			sendMailService.sendMail(matches.getMatchesId().getEmail_mentor(), "You were matched with a mentee!", body);
+//			sendMailService.sendMail(matches.getMatchesId().getEmail_mentor(), "You were matched with a mentee!", body);
 			body = "Hi " + menteeCred.getName() + ",\nYou are matched with : " + mentorCred.getName() + ", Email : "
 					+ matches.getMatchesId().getEmail_mentor() + " \nTime slot : "
 					+ simpleDateFormat.format(matches.getMatchesId().getFrom()) + " to : "
@@ -214,7 +214,7 @@ public class SchedularService {
 			if (null != mentorCred.getCaseName() && !mentorCred.getCaseName().isEmpty())
 				body += "\nAvailable cases : " + mentorCred.getCaseName();
 			logger.info("mentee body : {}", body);
-			sendMailService.sendMail(matches.getMatchesId().getEmail_mentee(), "You were matched with a mentor!", body);
+//			sendMailService.sendMail(matches.getMatchesId().getEmail_mentee(), "You were matched with a mentor!", body);
 		}
 	}
 
