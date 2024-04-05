@@ -20,9 +20,9 @@ public class JpaConfiguration {
 	 public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://64.225.8.25:3306/tuckcons_schedular?serverTimezone=America/New_York");
-        dataSource.setUsername( "tuckcons_tooladmin" );
-        dataSource.setPassword( "HghcJ?;$D[6z" );
+        dataSource.setUrl("jdbc:mysql://hosturl:post/dbname?serverTimezone=America/New_York");
+        dataSource.setUsername( "username" );
+        dataSource.setPassword( "Password" );
         return dataSource;
     }
 
